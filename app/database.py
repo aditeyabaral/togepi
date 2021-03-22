@@ -3,8 +3,6 @@ import dotenv
 import datetime
 from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
 from utils import *
 
 dotenv.load_dotenv()
@@ -22,9 +20,9 @@ class Repository(db.Model):
     url = db.Column(db.String(1024), nullable=False)
     create_time = db.Column(db.DateTime, nullable=False)
     visibility = db.Column(db.String(10), nullable=False)
-    owner_id = db.Column(db.String(1024), ForeignKey(
+    owner_id = db.Column(db.String(1024), db.ForeignKey(
         'user._id', ondelete='CASCADE'), nullable=False)
-    # user_relation = relationship("user", back_populates="repository")
+    # user_relation = db.relationship("user", back_populates="repository")
 
     def __init__(self, repo_name, visibility) -> None:
         self.name = repo_name
@@ -51,13 +49,13 @@ class User(db.Model):
 class OwnerRepositoryRelation(db.Model):
     __tablename__ = "repositoryuserelation"
     _id = db.Column(db.String(26), primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(26), ForeignKey(
+    user_id = db.Column(db.String(26), db.ForeignKey(
         'user._id'), nullable=False)  # Check cascade
-    repository_id = db.Column(db.String(26), ForeignKey(
+    repository_id = db.Column(db.String(26), db.ForeignKey(
         'repository._id', ondelete='CASCADE'), nullable=False)
     relation = db.Column(db.String(20), nullable=False)
-    # user_relation = relationship("user", back_populates="repositoryuserelation")
-    # repository_relation = relationship("repository", back_populates="repositoryuserelation")
+    # user_relation = db.relationship("user", back_populates="repositoryuserelation")
+    # repository_relation = db.relationship("repository", back_populates="repositoryuserelation")
 
     def __init__(self, user_id, repository_id, relation) -> None:
         self.user_id = user_id
