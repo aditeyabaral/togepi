@@ -13,6 +13,20 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
+class User(db.Model):
+    __tablename__ = "user"
+    _id = db.Column(db.String(26), primary_key=True)
+    username = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+
+    def __init__(self, name, email, password) -> None:
+        self.username = name
+        self.email = email
+        self.user_id = getRandomID()  # Check database
+        self.password = password
+
+
 class Repository(db.Model):
     __tablename__ = "repository"
     _id = db.Column(db.String(26), primary_key=True)
@@ -30,20 +44,6 @@ class Repository(db.Model):
         self._id = getRandomID()  # check with database
         self.url = getRepoURL(self.name, self._id)
         self.create_time = datetime.utcnow()
-
-
-class User(db.Model):
-    __tablename__ = "user"
-    _id = db.Column(db.String(26), primary_key=True)
-    username = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
-
-    def __init__(self, name, email, password) -> None:
-        self.username = name
-        self.email = email
-        self.user_id = getRandomID()  # Check database
-        self.password = password
 
 
 class OwnerRepositoryRelation(db.Model):
