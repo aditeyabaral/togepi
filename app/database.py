@@ -1,11 +1,11 @@
 import os
-from sqlalchemy.orm import relationship
-from .utils import *
 import dotenv
 import datetime
 from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+from .utils import *
 
 dotenv.load_dotenv()
 
