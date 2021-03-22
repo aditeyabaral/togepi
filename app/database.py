@@ -1,6 +1,6 @@
 import os
 from sqlalchemy.orm import relationship
-from utils import *
+from .utils import *
 import dotenv
 import datetime
 from flask import Flask
