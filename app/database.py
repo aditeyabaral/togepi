@@ -61,5 +61,5 @@ class OwnerRepositoryRelation(db.Model):
         self.relation = relation
 
 
-#if __name__ == "__main__":
-#    app.run()
+if __name__ == "__main__":
+    app.run()
