@@ -5,7 +5,7 @@ from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-from .utils import *
+from utils import *
 
 dotenv.load_dotenv()
 
