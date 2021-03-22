@@ -48,7 +48,7 @@ class Repository(db.Model):
 
 class OwnerRepositoryRelation(db.Model):
     __tablename__ = "repositoryuserelation"
-    _id = db.Column(db.String(26), primary_key=True, autoincrement=True)
+    _id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.String(26), db.ForeignKey(
         'user._id'), nullable=False)  # Check cascade
     repository_id = db.Column(db.String(26), db.ForeignKey(
