@@ -2,3 +2,5 @@
 __pycache__/
 version-control/
 vc/
+src/
+test/
