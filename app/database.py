@@ -104,19 +104,6 @@ class Commit(db.Model):
         self.message = message
 
 
-class Push(db.Model):
-    __tablename__ = "push"
-    _id = db.Column(db.String(26), primary_key=True)
-    commit_id = db.Column(db.String(26), db.ForeignKey(
-        'commit._id', ondelete='CASCADE'), primary_key=True)
-    time = db.Column(db.DateTime, nullable=False)
-
-    def __init__(self, _id, commit_id, time) -> None:
-        self._id = _id
-        self.commit_id = commit_id
-        self.time = time
-
-
 @app.route("/", methods=["GET", "POST"])
 def home():
     return redirect("https://github.com/aditeyabaral/version-control", 302)
