@@ -66,9 +66,9 @@ class OwnerRepositoryRelation(db.Model):
 class File(db.Model):
     __tablename__ = "file"
     _id = db.Column(db.String(26), primary_key=True)
-    path = db.Column(db.String(26), nullable=False, primary_key=True)
+    path = db.Column(db.String(26), nullable=False)
     repository_id = db.Column(db.String(26), db.ForeignKey(
-        'repository._id', ondelete='CASCADE'), nullable=False, primary_key=True)
+        'repository._id', ondelete='CASCADE'), nullable=False)
     status = db.Column(db.String(15), nullable=False)
     last_modified = db.Column(db.DateTime)
     last_committed = db.Column(db.DateTime)
