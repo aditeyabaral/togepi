@@ -2,6 +2,9 @@ import re
 import cliUtils
 import userUtils
 
+current_user = None
+current_repository = None
+
 
 def checkCommandCLI(command):
     cd_command = re.compile(r"cd ([\.A-Za-z0-9\\/_]+)")
@@ -23,7 +26,7 @@ def checkCommandCLI(command):
     }
 
     if command == "ls":
-        # handle this elegantly [LATER]
+        # handle this elegantly [LATER, NOT PRIORITY]
         return True, cli_function_mapping[ls_command], "."
 
     for command_type in cli_function_mapping:
@@ -34,7 +37,7 @@ def checkCommandCLI(command):
     return False, None, None
 
 
-def checkCommandUser(command):
+def checkCommandUser(command):  # add log out
     user_create_command = re.compile(r"vc user create")
     user_login_command = re.compile(
         r"vc user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
@@ -54,7 +57,11 @@ def checkCommandUser(command):
     return False, None, None
 
 
-def runCommand(command, current_user=None, current_repository=None):
+def runCommand(command):
+
+    global current_user
+    global current_repository
+
     '''
         vc add .
         vc add file1 file2 ...
@@ -77,6 +84,5 @@ def runCommand(command, current_user=None, current_repository=None):
         else:
             username, password = args
             user_id = user_command(username, password)
+        current_user = user_id
         return user_id
-
-    return
