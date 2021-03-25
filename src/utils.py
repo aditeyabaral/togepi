@@ -54,7 +54,7 @@ def checkCommandUser(command):
     return False, None, None
 
 
-def runCommand(command):
+def runCommand(command, current_user=None, current_repository=None):
     '''
         vc add .
         vc add file1 file2 ...
