@@ -11,5 +11,5 @@ while True:
     else:
         utils.runCommand(command)
         # result = utils.runCommand(command)
-        #if result is not None and result.startswith("USER"):
+        # if result is not None and result.startswith("USER"):
         #    current_user = result
