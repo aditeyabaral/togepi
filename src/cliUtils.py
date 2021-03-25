@@ -1,17 +1,5 @@
-import string
-import random
-import shutil
 import os
-
-
-'''def getRandomID():
-    random_id = "".join(ch for ch in random.choice(
-        string.ascii_letters+string.digits))
-    return random_id
-
-
-def getRepoURL(repo_name, repo_id):
-    return f"https://version-control.com/{id}"'''
+import shutil
 
 
 def nano(filename):
@@ -32,7 +20,8 @@ def mkdir(dirname):
     try:
         os.mkdir(path)
     except:
-        print("Error while creating directory!")
+        print("Error while creating directory.")
+
 
 def rmdir(dirname):
     cur_path = os.getcwd()
@@ -40,11 +29,11 @@ def rmdir(dirname):
     try:
         shutil.rmtree(path)
     except:
-        print("Error while deleting directory!")
+        print("Error while deleting directory.")
 
 
 def cd(path):
     try:
         os.chdir(path)
     except OSError:
-        print("Error while changing path")
+        print("Error while changing path.")

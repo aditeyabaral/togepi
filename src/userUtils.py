@@ -13,9 +13,9 @@ def generateUserID():
 
 
 def createUser():
-    username = input("Enter username: ")
-    email = input("Enter email: ")
-    password = input("Enter password: ")
+    username = input("Enter username: ")    # validate
+    email = input("Enter email: ")          # validate
+    password = input("Enter password: ")    # validate
     _id = generateUserID()
     print(f"Creating ID: {_id}")
     dbUtils.createUser(_id, username, email, password)

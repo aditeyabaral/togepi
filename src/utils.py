@@ -3,29 +3,14 @@ import cliUtils
 import userUtils
 
 
-def runCommand(command):
-    '''
-        vc user create
-        vc user login username password
-        vc add .
-        vc add file1 file2 ...
-        vc commit -m "message"
-        vc commit -am "message"
-        vc push
-        vc pull
-        vc init repo_name
-    '''
-
+def checkCommandCLI(command):
     cd_command = re.compile(r"cd ([\.A-Za-z0-9\\/_]+)")
     ls_command = re.compile(r"ls ([\.A-Za-z0-9\\/_]*)")
     cat_command = re.compile(r"cat ([\.A-Za-z0-9\\/_]+)")
     nano_command = re.compile(r"nano ([\.A-Za-z0-9\\/_]+)")
     mkdir_command = re.compile(r"mkdir ([\.A-Za-z0-9\\/_]+)")
     rmdir_command = re.compile(r"rmdir ([\.A-Za-z0-9\\/_]+)")
-
-    user_create_command = re.compile(r"vc user create")
-    user_login_command = re.compile(
-        r"vc user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
+    # add rm for files
 
     cli_function_mapping = {
         cd_command: cliUtils.cd,
@@ -37,30 +22,61 @@ def runCommand(command):
 
     }
 
+    if command == "ls":
+        # handle this elegantly [LATER]
+        return True, cli_function_mapping[ls_command], "."
+
+    for command_type in cli_function_mapping:
+        args = re.findall(command_type, command)
+        if args:
+            return True, cli_function_mapping[command_type], args[0]
+
+    return False, None, None
+
+
+def checkCommandUser(command):
+    user_create_command = re.compile(r"vc user create")
+    user_login_command = re.compile(
+        r"vc user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
+
     user_function_mapping = {
         user_create_command: userUtils.createUser,
         user_login_command: userUtils.loginUser
     }
 
-    for command_type in cli_function_mapping:
-        args = re.findall(command_type, command)
-        if args:
-            cli_function_mapping[command_type](args[0])
-            return
-        elif command == "ls":   # handle this elegantly
-            cli_function_mapping[ls_command](".")
-            return
-        else:
-            pass
-
     if command == "vc user create":
-        user_id = userUtils.createUser()
-        return user_id
+        return True, userUtils.createUser, None
 
-    args = re.findall(command_type, command)
+    args = re.findall(user_login_command, command)
     if args:
-        username, password = args[0]
-        user_id = userUtils.loginUser(username, password)
+        return True, userUtils.loginUser, args[0]
+
+    return False, None, None
+
+
+def runCommand(command):
+    '''
+        vc add .
+        vc add file1 file2 ...
+        vc commit -m "message"
+        vc commit -am "message"
+        vc push
+        vc pull
+        vc init repo_name
+    '''
+
+    function_found, cli_command, args = checkCommandCLI(command)
+    if function_found:
+        cli_command(args)
+        return
+
+    function_found, user_command, args = checkCommandUser(command)
+    if function_found:
+        if args is None:
+            user_id = user_command()
+        else:
+            username, password = args
+            user_id = user_command(username, password)
         return user_id
 
-    return None, None
+    return

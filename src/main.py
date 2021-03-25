@@ -2,6 +2,7 @@ import sys
 import utils
 
 current_user = None
+current_repository = None
 
 while True:
     command = input(">>> ")
