@@ -30,7 +30,7 @@ class Repository(db.Model):
     _id = db.Column(db.String(26), primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(150))
-    url = db.Column(db.String(1024), nullable=False)    # change to path?
+    url = db.Column(db.String(1024), nullable=False)
     create_time = db.Column(db.DateTime, nullable=False)
     visibility = db.Column(db.String(10), nullable=False)
     owner_id = db.Column(db.String(1024), db.ForeignKey(

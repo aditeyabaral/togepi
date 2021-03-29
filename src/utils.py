@@ -1,6 +1,8 @@
+import os
 import re
 import cliUtils
 import userUtils
+import repoUtils
 
 current_user = None
 current_repository = None
@@ -57,6 +59,14 @@ def checkCommandUser(command):  # add log out
     return False, None, None
 
 
+def checkCommandRepository(command):
+    create_repo_command = re.compile(r"vc init ([A-Za-z0-9_]*)")
+
+    args = re.findall(create_repo_command, command)
+    if args:
+        return True, repoUtils.init, args[0]
+
+
 def runCommand(command):
 
     global current_user
@@ -66,15 +76,18 @@ def runCommand(command):
         vc add .
         vc add file1 file2 ...
         vc commit -m "message"
-        vc commit -am "message"
         vc push
         vc pull
-        vc init repo_name
     '''
 
     function_found, cli_command, args = checkCommandCLI(command)
     if function_found:
         cli_command(args)
+        if ".togepi" in os.listdir():
+            with open(".togepi/info.txt") as f:
+                content = f.read().strip().split('\n')
+                _, current_repository = content[0].split(',')
+                current_repository = current_repository.strip()
         return
 
     function_found, user_command, args = checkCommandUser(command)
@@ -86,3 +99,10 @@ def runCommand(command):
             user_id = user_command(username, password)
         current_user = user_id
         return user_id
+
+    function_found, repo_command, args = checkCommandRepository(command)
+    if current_user is None:
+        print("Please login before performing repository functions.")
+    else:
+        if function_found:
+            repo_command(current_user, args)

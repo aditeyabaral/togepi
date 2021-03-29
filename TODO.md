@@ -4,12 +4,8 @@ vc pull
 show untracked changes
 show git status
 
-1. `vc init reponame`
-    * Call mkdir with reponame
-    * Get repo details, push to database
-    * Inside repo, make folder named .togepi
-        * This folder will store each version of each file (in folders maybe)
-        * Also store repo_id and other details in info.txt
+
+create db objects beforehand while making connection (dbUtils)
 
 2. `checkCwdIsRepository()`
     * Check and set `current_repository` global variable
