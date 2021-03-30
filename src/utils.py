@@ -7,6 +7,32 @@ import repoUtils
 current_user = None
 current_repository = None
 
+def help(*vargs):
+    content = '''TOGEPI
+
+Togepi is a command line based version control system built using Python3 and Google Drive API
+
+1. User Commands
+
+tgp create user -- Create an account
+tgp user login username password -- Login to existing account
+
+2. Repository Commands
+
+tgp init repository_name -- Create a new repository
+
+3. CLI tools
+
+You can invoke other CLI commands such as -- 
+
+cd
+ls
+cat
+nano
+rmdir
+mkdir'''
+    print(content)
+
 
 def checkCommandCLI(command):
     cd_command = re.compile(r"cd ([\.A-Za-z0-9\\/_]+)")
@@ -27,6 +53,9 @@ def checkCommandCLI(command):
 
     }
 
+    if command == "help":
+        return True, help, None
+
     if command == "ls":
         # handle this elegantly [LATER, NOT PRIORITY]
         return True, cli_function_mapping[ls_command], "."
@@ -40,16 +69,16 @@ def checkCommandCLI(command):
 
 
 def checkCommandUser(command):  # add log out
-    user_create_command = re.compile(r"vc user create")
+    user_create_command = re.compile(r"tgp user create")
     user_login_command = re.compile(
-        r"vc user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
+        r"tgp user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
 
     user_function_mapping = {
         user_create_command: userUtils.createUser,
         user_login_command: userUtils.loginUser
     }
 
-    if command == "vc user create":
+    if command == "tgp user create":
         return True, userUtils.createUser, None
 
     args = re.findall(user_login_command, command)
@@ -60,7 +89,7 @@ def checkCommandUser(command):  # add log out
 
 
 def checkCommandRepository(command):
-    create_repo_command = re.compile(r"vc init ([A-Za-z0-9_]*)")
+    create_repo_command = re.compile(r"tgp init ([A-Za-z0-9_]*)")
 
     args = re.findall(create_repo_command, command)
     if args:
@@ -73,11 +102,11 @@ def runCommand(command):
     global current_repository
 
     '''
-        vc add .
-        vc add file1 file2 ...
-        vc commit -m "message"
-        vc push
-        vc pull
+        tgp add .
+        tgp add file1 file2 ...
+        tgp commit -m "message"
+        tgp push
+        tgp pull
     '''
 
     function_found, cli_command, args = checkCommandCLI(command)
