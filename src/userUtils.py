@@ -1,4 +1,5 @@
 import dbUtils
+import fsUtils
 
 
 def generateUserID():
@@ -19,6 +20,7 @@ def createUser():
     _id = generateUserID()
     print(f"Creating ID: {_id}")
     dbUtils.createUser(_id, username, email, password)
+    fsUtils.create_folder(_id)
     return _id
 
 
