@@ -7,4 +7,7 @@ while True:
     if command == "exit":
         sys.exit(0)
     else:
-        utils.runCommand(command)
+        try:
+            utils.runCommand(command)
+        except Exception as e:
+            print(e)

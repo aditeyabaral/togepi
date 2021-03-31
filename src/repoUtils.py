@@ -7,6 +7,7 @@ import dbUtils
 import cliUtils
 import fsUtils
 
+
 def generateRepositoryID():
     all_repos = dbUtils.getAllRepositoryID()
     if not all_repos:
@@ -16,6 +17,17 @@ def generateRepositoryID():
         new_roll_number = str(roll_numbers[-1] + 1)
         repo_id = f"REPO#{new_roll_number.zfill(6)}"
     return repo_id
+
+
+def generateFileID():
+    all_files = dbUtils.getAllFileID()
+    if not all_files:
+        file_id = "FILE#000001"
+    else:
+        roll_numbers = sorted([int(i[0][5:]) for i in all_files])
+        new_roll_number = str(roll_numbers[-1] + 1)
+        file_id = f"FILE#{new_roll_number.zfill(6)}"
+    return file_id
 
 
 def createInfoFile(user_id, repo_name, repo_id, description, url, create_time, visibility):
@@ -67,17 +79,28 @@ def init(user_id, repo_name):
 
 
 def add(user_id, repo_name, filepaths):
+
+    # check if user_id is collaborator/owner
+    # check if files were deleted -- untrack these files by deleting from db (and dropbox folder)
+
     if filepaths == ".":
         filepaths = [y for x in os.walk(".")
-             for y in glob(os.path.join(x[0], '*.*'))]
-    
+                     for y in glob(os.path.join(x[0], '*.*'))]
+
     with open(f".togepi/info.txt") as f:
         content = f.read().strip().split('\n')
         _, repo_id = content[0].split(',')
         repo_id = repo_id.strip()
 
-    
+    if ".tgpignore" in os.listdir():
+        with open(".tgpignore") as f:
+            ignored_files = f.read().strip().split('\n')    # handle dir
 
+    new_tracked_files = list()
+    for f in filepaths:
+        if not dbUtils.checkFileInDatabase(repo_id, f):  # and check .tgpignore
+            new_tracked_files.append(f)
 
-
-add("USER#000002", "testrepo", ".")
+    for tracked_file in new_tracked_files:
+        file_id = generateFileID()
+        dbUtils.createFile(file_id, tracked_file, repo_id, "unchanged", None, None, None)

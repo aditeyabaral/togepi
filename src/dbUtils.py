@@ -45,6 +45,13 @@ def getAllRepositoryID():
     return all_repos
 
 
+def getAllFileID():
+    table = Table("file", metadata, autoload=True, autoload_with=engine)
+    # change this to table.select
+    all_files = session.query(table.columns._id).all()
+    return all_files
+
+
 def createUser(_id, username, email, password):
     table = Table("developer", metadata, autoload=True, autoload_with=engine)
     query = table.insert().values(_id=_id, username=username,
@@ -68,6 +75,22 @@ def checkUserCredentials(username, password):
         print("Invalid username or password.")
 
 
+def checkFileInDatabase(repo_id, filepath):
+    table = Table("file", metadata, autoload=True, autoload_with=engine)
+    query = table.select().where(
+        and_(table.c.repository_id == repo_id, table.c.path == filepath))
+    result = connection.execute(query).fetchall()
+    return bool(result)
+
+
+def createFile(_id, path, repository_id, status, last_modified=None, last_committed=None, last_pushed=None):
+    table = Table("file", metadata, autoload=True, autoload_with=engine)
+    query = table.insert().values(_id=_id, repository_id=repository_id, path=path,
+                                  status=status, last_modified=last_modified, last_committed=last_committed, last_pushed=last_pushed)
+    result = connection.execute(query)
+    print(f"File {path} successfully tracked.")
+
+
 def createRepository(user_id, repo_name, repo_id, description, url, create_time, visibility):
     table = Table("repository", metadata, autoload=True, autoload_with=engine)
     query = table.insert().values(_id=repo_id, owner_id=user_id, name=repo_name,
@@ -82,11 +105,3 @@ def createUserRepositoryRelation(user_id, repo_id, relation="owner"):
     query = table.insert().values(developer_id=user_id,
                                   repository_id=repo_id, relation=relation)
     result = connection.execute(query)
-
-
-def createFile(user_id, repo_name, repo_id, description, url, create_time, visibility):
-    table = Table("repository", metadata, autoload=True, autoload_with=engine)
-    query = table.insert().values(_id=repo_id, owner_id=user_id, name=repo_name,
-                                  description=description, url=url, create_time=create_time, visibility=visibility)
-    result = connection.execute(query)
-    print("New repository successfully created.")

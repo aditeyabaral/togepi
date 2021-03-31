@@ -7,6 +7,7 @@ import repoUtils
 current_user = None
 current_repository = None
 
+
 def help(*vargs):
     content = '''TOGEPI
 
@@ -90,10 +91,19 @@ def checkCommandUser(command):  # add log out
 
 def checkCommandRepository(command):
     create_repo_command = re.compile(r"tgp init ([A-Za-z0-9_]*)")
+    add_files_command = re.compile(r"tgp add (( *[A-Za-z0-9._]*)*)")
 
-    args = re.findall(create_repo_command, command)
-    if args:
-        return True, repoUtils.init, args[0]
+    repo_function_mapping = {
+        create_repo_command: repoUtils.init,
+        add_files_command: repoUtils.add
+    }
+
+    for command_type in repo_function_mapping:
+        args = re.findall(command_type, command)
+        if args:
+            if command_type == add_files_command:
+                args = args[0]
+            return True, repo_function_mapping[command_type], args[0]
 
 
 def runCommand(command):
@@ -134,4 +144,7 @@ def runCommand(command):
         print("Please login before performing repository functions.")
     else:
         if function_found:
-            repo_command(current_user, args)
+            if repo_command == repoUtils.add:
+                repoUtils.add(current_user, current_repository, args)
+            else:
+                repo_command(current_user, args)
