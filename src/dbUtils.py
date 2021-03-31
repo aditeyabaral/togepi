@@ -82,3 +82,11 @@ def createUserRepositoryRelation(user_id, repo_id, relation="owner"):
     query = table.insert().values(developer_id=user_id,
                                   repository_id=repo_id, relation=relation)
     result = connection.execute(query)
+
+
+def createFile(user_id, repo_name, repo_id, description, url, create_time, visibility):
+    table = Table("repository", metadata, autoload=True, autoload_with=engine)
+    query = table.insert().values(_id=repo_id, owner_id=user_id, name=repo_name,
+                                  description=description, url=url, create_time=create_time, visibility=visibility)
+    result = connection.execute(query)
+    print("New repository successfully created.")

@@ -1,4 +1,5 @@
 import os
+from glob import glob
 from datetime import date, datetime
 
 from sqlalchemy.sql.expression import desc
@@ -24,7 +25,8 @@ user_id,{user_id}
 url,{url}
 description,{description}
 create_time,{str(create_time)},
-visibility,{visibility}'''
+visibility,{visibility}
+collaborators,'''
 
     with open(f"{repo_name}/.togepi/info.txt", "w") as f:
         f.write(content)
@@ -60,5 +62,22 @@ def init(user_id, repo_name):
 
     dropbox_path = f"/{username}/{repo_name}/"
     local_path = os.path.join(os.getcwd(), repo_name)
-    fsUtils.upload_folder(local_path, dropbox_path)
+    fsUtils.uploadFolder(local_path, dropbox_path)
     return True
+
+
+def add(user_id, repo_name, filepaths):
+    if filepaths == ".":
+        filepaths = [y for x in os.walk(".")
+             for y in glob(os.path.join(x[0], '*.*'))]
+    
+    with open(f".togepi/info.txt") as f:
+        content = f.read().strip().split('\n')
+        _, repo_id = content[0].split(',')
+        repo_id = repo_id.strip()
+
+    
+
+
+
+add("USER#000002", "testrepo", ".")
