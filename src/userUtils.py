@@ -20,7 +20,7 @@ def createUser():
     _id = generateUserID()
     print(f"Creating ID: {_id}")
     dbUtils.createUser(_id, username, email, password)
-    fsUtils.create_folder(_id)
+    fsUtils.create_folder(username)
     return _id
 
 

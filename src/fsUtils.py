@@ -26,11 +26,10 @@ def ls_dropbox(dropbox_path=""):
         print(entry.name)
 
 
-def create_folder(user_id):
-    folder_name = user_id.split("#")[-1]
-    if not folder_name.startswith("/"):
-        folder_name = "/"+folder_name
-    dbx.files_create_folder(folder_name)
+def create_folder(dropbox_path):
+    if not dropbox_path.startswith("/"):
+        dropbox_path = "/"+dropbox_path
+    dbx.files_create_folder(dropbox_path)
 
 
 def upload_folder(local_path, dropbox_path):

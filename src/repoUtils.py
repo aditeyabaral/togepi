@@ -4,7 +4,7 @@ from datetime import date, datetime
 from sqlalchemy.sql.expression import desc
 import dbUtils
 import cliUtils
-
+import fsUtils
 
 def generateRepositoryID():
     all_repos = dbUtils.getAllRepositoryID()
@@ -57,4 +57,8 @@ def init(user_id, repo_name):
     dbUtils.createRepository(user_id, repo_name, repo_id,
                              description, url, create_time, visibility)
     dbUtils.createUserRepositoryRelation(user_id, repo_id)
+
+    dropbox_path = f"/{username}/{repo_name}/"
+    local_path = os.path.join(os.getcwd(), repo_name)
+    fsUtils.upload_folder(local_path, dropbox_path)
     return True
