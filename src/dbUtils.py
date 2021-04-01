@@ -21,13 +21,13 @@ repo_user_table = Table("repositoryuserelation", metadata,
 
 def checkUserRepositoryExists(user_id, repo_name):
     query = repo_table.select().where(
-        and_(table.c.owner_id == user_id, table.c.name == repo_name))
+        and_(repo_table.c.owner_id == user_id, repo_table.c.name == repo_name))
     result = connection.execute(query).fetchall()
     return bool(result)
 
 
 def getUsername(user_id):
-    query = dev_table.select().where(table.c._id == user_id)
+    query = dev_table.select().where(dev_table.c._id == user_id)
     result = connection.execute(query).fetchall()[0][1]
     return result
 
