@@ -1,5 +1,6 @@
 import dbUtils
 import fsUtils
+import validationUtils
 
 
 def generateUserID():
@@ -14,9 +15,18 @@ def generateUserID():
 
 
 def createUser():
-    username = input("Enter username: ")    # validate
-    email = input("Enter email: ")          # validate
-    password = input("Enter password: ")    # validate
+    while True:
+        username = input("Enter username: ")
+        if validationUtils.validateUsername(username):
+            break
+    while True:
+        email = input("Enter email: ")
+        if validationUtils.validateEmail(email):
+            break
+    while True:
+        password = input("Enter password: ")
+        if validationUtils.validatePassword(password):
+            break
     _id = generateUserID()
     print(f"Creating ID: {_id}")
     dbUtils.createUser(_id, username, email, password)
