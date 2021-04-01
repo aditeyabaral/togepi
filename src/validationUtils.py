@@ -9,6 +9,8 @@ def validateUsername(username):
         print("Invalid username! Username cannot contain special characters at the beginning or end, or consecutively!")
         return False
     allUsernames = dbUtils.getAllUsername()
+    if allUsernames == []: # Handles no entries in DB
+        return True
     if username in allUsernames[0]:
         print("Sorry, that username already exists! Please try another one")
         return False
