@@ -31,4 +31,6 @@
 
 9. DB Cleanup
 
-10. Testing
+10. README
+
+11. Testing
