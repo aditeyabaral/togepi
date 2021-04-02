@@ -1,3 +1,4 @@
+from os.path import isfile
 import dropbox
 import os
 import dotenv
@@ -14,6 +15,15 @@ def downloadFile(local_path, dropbox_path):
     cont = f.content.decode()
     out.write(cont)
     out.close()
+
+
+def getContent(dropbox_path):
+    try:
+        metadata, f = dbx.files_download(dropbox_path)
+        cont = f.content.decode()
+    except:
+        cont = ""
+    return cont
 
 
 def uploadFile(local_path, dropbox_path):
@@ -33,11 +43,18 @@ def createFolder(dropbox_path):
 
 
 def uploadFolder(local_path, dropbox_path):
-    files = [y for x in os.walk(local_path)
-             for y in glob(os.path.join(x[0], '*.*'))]
+    files = [ 
+       os.path.join(parent, name)
+       for (parent, subdirs, files) in os.walk(local_path)
+       for name in files + subdirs
+   ]
+
+    files = [fname for fname in files if os.path.isfile(fname)]
+
+    print(files)
     for file in files:
         rel_path = os.path.relpath(file, local_path)
         dropbox_file_path = os.path.join(dropbox_path, rel_path)
         with open(file, "rb") as f:
             print(f'Uploading {rel_path}')
-            dbx.files_upload(f.read(), dropbox_file_path)
+            dbx.files_upload(f.read(), dropbox_file_path, mode=dropbox.files.WriteMode.overwrite)

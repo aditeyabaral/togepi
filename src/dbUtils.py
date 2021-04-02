@@ -13,6 +13,7 @@ session = Session()
 metadata = MetaData()
 
 repo_table = Table("repository", metadata, autoload=True, autoload_with=engine)
+commit_table = Table("commit", metadata, autoload=True, autoload_with=engine)
 dev_table = Table("developer", metadata, autoload=True, autoload_with=engine)
 file_table = Table("file", metadata, autoload=True, autoload_with=engine)
 repo_user_table = Table("repositoryuserelation", metadata,
@@ -47,9 +48,30 @@ def getAllRepositoryID():
     return all_repos
 
 
+def getAllCommitID():
+    all_commits = session.query(commit_table.columns._id).all()
+    return all_commits
+
+
 def getAllFileID():
     all_files = session.query(file_table.columns._id).all()
     return all_files
+
+
+def getTrackedFiles(repo_id):
+    query = file_table.select().where(file_table.c.repository_id == repo_id)
+    result = connection.execute(query).fetchall()
+    tracked_files = list()
+    for f in result:
+        tracked_files.append(f[1])
+    return tracked_files
+
+
+def getFileID(repo_id, fname):
+    query = file_table.select().where(
+        and_(file_table.c.repository_id == repo_id, file_table.c.path == fname))
+    result = connection.execute(query).fetchall()
+    return result[0][0]
 
 
 def createUser(_id, username, email, password):
@@ -57,6 +79,13 @@ def createUser(_id, username, email, password):
                                       email=email, password=password)
     result = connection.execute(query)
     print("New user successfully created.")
+
+
+def createCommit(_id, developer_id, repository_id, time, file_id, message=None):
+    query = commit_table.insert().values(_id=_id, developer_id=developer_id,
+                                         repository_id=repository_id, time=time, file_id=file_id, message=message)
+    result = connection.execute(query)
+    # print("Changes committed.")
 
 
 def checkUserCredentials(username, password):

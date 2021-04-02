@@ -5,7 +5,8 @@ import userUtils
 import repoUtils
 
 current_user = None
-current_repository = None
+current_repository_id = None
+current_repository_name = None
 
 
 def help(*vargs):
@@ -92,11 +93,16 @@ def checkCommandUser(command):  # add log out
 def checkCommandRepository(command):
     create_repo_command = re.compile(r"tgp init ([A-Za-z0-9_]*)")
     add_files_command = re.compile(r"tgp add (( *[A-Za-z0-9._]*)*)")
+    commit_files_command = re.compile(r"tgp commit ([A-Za-z0-9_]*)")
 
     repo_function_mapping = {
         create_repo_command: repoUtils.init,
-        add_files_command: repoUtils.add
+        add_files_command: repoUtils.add,
+        commit_files_command: repoUtils.commit
     }
+
+    if command == "tgp push":
+        return True, repoUtils.push, None
 
     for command_type in repo_function_mapping:
         args = re.findall(command_type, command)
@@ -109,7 +115,8 @@ def checkCommandRepository(command):
 def runCommand(command):
 
     global current_user
-    global current_repository
+    global current_repository_id
+    global current_repository_name
 
     '''
         tgp add .
@@ -125,8 +132,11 @@ def runCommand(command):
         if ".togepi" in os.listdir():
             with open(".togepi/info.txt") as f:
                 content = f.read().strip().split('\n')
-                _, current_repository = content[0].split(',')
-                current_repository = current_repository.strip()
+                _, current_repository_id = content[0].split(',')
+                current_repository_id = current_repository_id.strip()
+
+                _, current_repository_name = content[1].split(',')
+                current_repository_name = current_repository_name.strip()
         return
 
     function_found, user_command, args = checkCommandUser(command)
@@ -145,6 +155,8 @@ def runCommand(command):
     else:
         if function_found:
             if repo_command == repoUtils.add:
-                repoUtils.add(current_user, current_repository, args)
+                repoUtils.add(current_user, current_repository_id, args)
+            elif repo_command == repoUtils.push:
+                repoUtils.push(current_user, current_repository_name)
             else:
-                repo_command(current_user, args)
+                repo_command(current_user, current_repository_name, args)
