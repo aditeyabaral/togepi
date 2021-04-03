@@ -81,14 +81,16 @@ collaborators,'''
         f.write(content)
 
 
-def init(user_id, repo_name):
+def init(cache, repo_name):
+    user_id = cache["current_user_id"]
+    username = cache["current_username"]
     if dbUtils.checkUserRepositoryExists(user_id, repo_name):
         print("Repository names have to be unique per user.")
         return False
 
     cliUtils.mkdir(repo_name)
     cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
-    username = dbUtils.getUsername(user_id)
+    # username = dbUtils.getUsername(user_id)
     repo_id = generateRepositoryID()
     description = input("Enter repository description? [y/n]: ")
     if description.lower() == 'n':
@@ -110,24 +112,30 @@ def init(user_id, repo_name):
     dbUtils.createUserRepositoryRelation(user_id, repo_id)
 
     dropbox_path = f"/{username}/{repo_name}/"
+    # before uploading track the info file
     local_path = os.path.join(os.getcwd(), repo_name)
     fsUtils.uploadFolder(local_path, dropbox_path)
     return True
 
 
-def add(user_id, repo_name, filepaths):
+def add(cache, filepaths):
 
     # check if user_id is collaborator/owner
     # check if files were deleted -- untrack these files by deleting from db (and dropbox folder)
 
-    if filepaths == ".":
-        filepaths = [y for x in os.walk(".")
-                     for y in glob(os.path.join(x[0], '*.*'))]
+    repo_id = cache["current_repository_id"]
+    print(cache)
 
-    with open(f".togepi/info.txt") as f:
-        content = f.read().strip().split('\n')
-        _, repo_id = content[0].split(',')
-        repo_id = repo_id.strip()
+    if filepaths == ".":
+        filepaths = [os.path.join(parent, name) for (
+            parent, subdirs, files) in os.walk(".") for name in files + subdirs]
+
+    filepaths = [fname for fname in filepaths if os.path.isfile(fname)]
+
+    # with open(f".togepi/info.txt") as f:
+    #     content = f.read().strip().split('\n')
+    #     _, repo_id = content[0].split(',')
+    #     repo_id = repo_id.strip()
 
     if ".tgpignore" in os.listdir():
         with open(".tgpignore") as f:
@@ -144,9 +152,14 @@ def add(user_id, repo_name, filepaths):
                            "unchanged", None, None, None)
 
 
-def commit(user_id, repo_name, message=None):
-    username = dbUtils.getUsername(user_id)
-    repo_id = getRepoIdFromDirectory()
+def commit(cache, message=None):
+    user_id = cache["current_user_id"]
+    username = cache["current_username"]
+    repo_id = cache["current_repository_id"]
+    repo_name = cache["current_repository_name"]
+
+    # username = dbUtils.getUsername(user_id)
+    # repo_id = getRepoIdFromDirectory()
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     modified_files = dict()
     for fname in tracked_files:
@@ -176,8 +189,11 @@ def commit(user_id, repo_name, message=None):
         print(f"modified - {modified_file}")
 
 
-def push(user_id, repo_name):
-    username = dbUtils.getUsername(user_id)
+def push(cache):
+    username = cache["current_username"]
+    repo_name = cache["current_repository_name"]
+
+    # username = dbUtils.getUsername(user_id)
     local_path = f"../{repo_name}"
     dropbox_path = f"/{username}/{repo_name}/"
     fsUtils.uploadFolder(local_path, dropbox_path)

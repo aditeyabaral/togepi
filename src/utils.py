@@ -4,36 +4,35 @@ import cliUtils
 import userUtils
 import repoUtils
 
-current_user = None
-current_repository_id = None
-current_repository_name = None
+# current_user = None
+# current_repository_id = None
+# current_repository_name = None
+
+cache = {
+    "current_user_id": None,
+    "current_username": None,
+    "current_repository_id": None,
+    "current_repository_name": None
+}
 
 
-def help(*vargs):
-    content = '''TOGEPI
+def setGlobalUserDetails():
+    global cache
+    # nothing to see here, move along
 
-Togepi is a command line based version control system built using Python3 and Google Drive API
 
-1. User Commands
+def setGlobalRepositoryDetails():
+    global cache
+    if ".togepi" in os.listdir():
+        with open(".togepi/info.txt") as f:
+            content = f.read().strip().split('\n')
+            _, current_repository_id = content[0].split(',')
+            current_repository_id = current_repository_id.strip()
 
-tgp create user -- Create an account
-tgp user login username password -- Login to existing account
-
-2. Repository Commands
-
-tgp init repository_name -- Create a new repository
-
-3. CLI tools
-
-You can invoke other CLI commands such as -- 
-
-cd
-ls
-cat
-nano
-rmdir
-mkdir'''
-    print(content)
+            _, current_repository_name = content[1].split(',')
+            current_repository_name = current_repository_name.strip()
+        cache["current_repository_id"] = current_repository_id
+        cache["current_repository_name"] = current_repository_name
 
 
 def checkCommandCLI(command):
@@ -56,7 +55,7 @@ def checkCommandCLI(command):
     }
 
     if command == "help":
-        return True, help, None
+        return True, cliUtils.help, None
 
     if command == "ls":
         # handle this elegantly [LATER, NOT PRIORITY]
@@ -79,6 +78,10 @@ def checkCommandUser(command):  # add log out
         user_create_command: userUtils.createUser,
         user_login_command: userUtils.loginUser
     }
+
+    if command == "tgp user logout":
+        pass
+        # do something here
 
     if command == "tgp user create":
         return True, userUtils.createUser, None
@@ -114,49 +117,48 @@ def checkCommandRepository(command):
 
 def runCommand(command):
 
-    global current_user
-    global current_repository_id
-    global current_repository_name
-
-    '''
-        tgp add .
-        tgp add file1 file2 ...
-        tgp commit -m "message"
-        tgp push
-        tgp pull
-    '''
+    # global current_user
+    # global current_repository_id
+    # global current_repository_name
+    global cache
+    # print(cache)
 
     function_found, cli_command, args = checkCommandCLI(command)
     if function_found:
         cli_command(args)
-        if ".togepi" in os.listdir():
-            with open(".togepi/info.txt") as f:
-                content = f.read().strip().split('\n')
-                _, current_repository_id = content[0].split(',')
-                current_repository_id = current_repository_id.strip()
-
-                _, current_repository_name = content[1].split(',')
-                current_repository_name = current_repository_name.strip()
+        setGlobalRepositoryDetails()
+        # if ".togepi" in os.listdir():
+        #     with open(".togepi/info.txt") as f:
+        #         content = f.read().strip().split('\n')
+        #         _, current_repository_id = content[0].split(',')
+        #         current_repository_id = current_repository_id.strip()
+        #         _, current_repository_name = content[1].split(',')
+        #         current_repository_name = current_repository_name.strip()
         return
 
     function_found, user_command, args = checkCommandUser(command)
     if function_found:
         if args is None:
-            user_id = user_command()
+            user_id, username = user_command()
         else:
             username, password = args
-            user_id = user_command(username, password)
-        current_user = user_id
-        return user_id
+            user_id, username = user_command(username, password)
+        cache["current_user_id"] = user_id
+        cache["current_username"] = username
+        return
 
     function_found, repo_command, args = checkCommandRepository(command)
-    if current_user is None:
+    if cache["current_user_id"] is None:
         print("Please login before performing repository functions.")
     else:
         if function_found:
-            if repo_command == repoUtils.add:
-                repoUtils.add(current_user, current_repository_id, args)
-            elif repo_command == repoUtils.push:
-                repoUtils.push(current_user, current_repository_name)
+            # if repo_command == repoUtils.add:
+            #     repoUtils.add(current_user, current_repository_id, args)
+            # elif repo_command == repoUtils.push:
+            #     repoUtils.push(current_user, current_repository_name)
+            # else:
+            #     repo_command(current_user, current_repository_name, args)
+            if args is None:
+                repo_command(cache)
             else:
-                repo_command(current_user, current_repository_name, args)
+                repo_command(cache, args)

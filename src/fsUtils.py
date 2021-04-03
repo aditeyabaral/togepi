@@ -43,18 +43,18 @@ def createFolder(dropbox_path):
 
 
 def uploadFolder(local_path, dropbox_path):
-    files = [ 
-       os.path.join(parent, name)
-       for (parent, subdirs, files) in os.walk(local_path)
-       for name in files + subdirs
-   ]
+    files = [
+        os.path.join(parent, name)
+        for (parent, subdirs, files) in os.walk(local_path)
+        for name in files + subdirs
+    ]
 
     files = [fname for fname in files if os.path.isfile(fname)]
 
-    print(files)
     for file in files:
         rel_path = os.path.relpath(file, local_path)
         dropbox_file_path = os.path.join(dropbox_path, rel_path)
         with open(file, "rb") as f:
             print(f'Uploading {rel_path}')
-            dbx.files_upload(f.read(), dropbox_file_path, mode=dropbox.files.WriteMode.overwrite)
+            dbx.files_upload(f.read(), dropbox_file_path,
+                             mode=dropbox.files.WriteMode.overwrite)

@@ -33,4 +33,18 @@
 
 10. README
 
-11. Testing
+11. help command
+
+12. Rename info.txt --> tgpinfo.txt
+
+13. Format of IDs --> Remove '#'
+
+14. Testing
+
+15. Track .togepi/info.txt by default
+
+16. Deletion of files
+
+17. Add, Commit, Push - only owner and collaborator have access
+
+18. Add collaborators

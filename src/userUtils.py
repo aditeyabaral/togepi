@@ -27,13 +27,16 @@ def createUser():
         password = input("Enter password: ")
         if validationUtils.validatePassword(password):
             break
-    _id = generateUserID()
-    print(f"Creating ID: {_id}")
-    dbUtils.createUser(_id, username, email, password)
+    user_id = generateUserID()
+    print(f"Creating ID: {user_id}")
+    dbUtils.createUser(user_id, username, email, password)
     fsUtils.createFolder(username)
-    return _id
+    return user_id, username
 
 
 def loginUser(username, password):
+    # Check if credentials are right -- return values based on that
     user_id = dbUtils.checkUserCredentials(username, password)
-    return user_id
+    if user_id is None:
+        username = None
+    return user_id, username

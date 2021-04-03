@@ -8,6 +8,7 @@ def nano(filename):
 
 def cat(filename):
     os.system(f"cat {filename}")
+    print()
 
 
 def ls(path="."):
@@ -37,3 +38,30 @@ def cd(path):
         os.chdir(path)
     except OSError:
         print("Error while changing path.")
+
+
+def help(*vargs):
+    content = '''TOGEPI
+
+Togepi is a command line based version control system built using Python3 and Google Drive API
+
+1. User Commands
+
+tgp create user -- Create an account
+tgp user login username password -- Login to existing account
+
+2. Repository Commands
+
+tgp init repository_name -- Create a new repository
+
+3. CLI tools
+
+You can invoke other CLI commands such as -- 
+
+cd
+ls
+cat
+nano
+rmdir
+mkdir'''
+    print(content)
