@@ -282,7 +282,17 @@ def clone(cache, clone_path):
     repo_username, repo_name = clone_path.split("/")
     repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
     if repo_status != "public":
-        print("Repository is public. Not available for cloning")
-        return
-    print(f"Cloning repository {repo_name}...")
-    fsUtils.downloadFolder(repo_username, repo_name)
+        print("Repository is private. Not available for cloning")
+    else:
+        print(f"Cloning repository {repo_name}...")
+        fsUtils.downloadFolder(repo_username, repo_name)
+
+
+# def fork(cache, clone_path):
+#     repo_username, repo_name = clone_path.split("/")
+#     repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
+#     if repo_status != "public":
+#         print("Repository is public. Not available for cloning")
+#     else:
+#         print(f"Cloning repository {repo_name}...")
+#         fsUtils.downloadFolder(repo_username, repo_name)

@@ -12,9 +12,9 @@ cache = {
 }
 
 
-def setGlobalUserDetails():
-    global cache
-    # nothing to see here, move along
+def logOutUserDetails():
+    print("You have logged out.")
+    return None, None
 
 
 def setGlobalRepositoryDetails():
@@ -54,7 +54,6 @@ def checkCommandCLI(command):
         return True, cliUtils.help, None
 
     if command == "ls":
-        # handle this elegantly [LATER, NOT PRIORITY]
         return True, cli_function_mapping[ls_command], "."
 
     for command_type in cli_function_mapping:
@@ -65,7 +64,7 @@ def checkCommandCLI(command):
     return False, None, None
 
 
-def checkCommandUser(command):  # add log out
+def checkCommandUser(command):
     user_create_command = re.compile(r"tgp user create")
     user_login_command = re.compile(
         r"tgp user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
@@ -76,8 +75,7 @@ def checkCommandUser(command):  # add log out
     }
 
     if command == "tgp user logout":
-        pass
-        # do something here
+        return True, logOutUserDetails, None
 
     if command == "tgp user create":
         return True, userUtils.createUser, None

@@ -13,25 +13,23 @@
     * tgp clone username/repo_name
         * check if you are collaborator (remove collab check for now)
       
-
-
-4. Add CLI commands
+5. Add CLI commands
     * cp
     * mv
     * rm
 
-5. Code cleanup
+6. Code cleanup
 
-6. README
+7. README
 
-7. help command
+8. help command
 
-8. Testing
+9. Testing
 
-9. Track .togepi/tgpinfo.txt by default
+10. Track .togepi/tgpinfo.txt by default
 
-9. Deletion of files
+11. Deletion of files
 
-10. Add, Commit, Push - only owner and collaborator have access
+12. Add, Commit, Push - only owner and collaborator have access
 
-11. Add collaborators
+13. Add collaborators
