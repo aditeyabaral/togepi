@@ -162,3 +162,14 @@ def getLastModifyTime(repo_id, fname):
     result = connection.execute(query).fetchall()
     print(result)
     return result[0][4]
+
+def getRepoStatus(repo_owner, repo_name):
+    query = dev_table.select().where(dev_table.c.username == repo_owner)
+    result = connection.execute(query).fetchall()
+    owner_id = result[0][0]
+    query = repo_table.select().where(
+        and_(repo_table.c.name == repo_name, repo_table.c.owner_id == owner_id)
+    )
+
+    result = connection.execute(query).fetchall()
+    return result[0][5]

@@ -35,7 +35,7 @@ def checkFileIsModified(diff):
             if l.startswith('+ '):
                 adds += 1
             elif l.startswith('- '):
-                dels+= 1
+                dels += 1
             else:
                 pass
     if adds > 0 or dels > 0:
@@ -146,13 +146,15 @@ def add(cache, filepaths):
         temp = list()
         for ig_file in ignored_files:
             if not os.path.isfile(ig_file):
-                sub_files = [os.path.join(parent, name) for (parent, subdirs, files) in os.walk(ig_file) for name in files + subdirs]
+                sub_files = [os.path.join(parent, name) for (
+                    parent, subdirs, files) in os.walk(ig_file) for name in files + subdirs]
                 temp.extend(sub_files)
             else:
                 temp.append(ig_file)
         ignored_files = list(temp)
 
-    filepaths = [fname for fname in filepaths if os.path.isfile(fname) and fname not in ignored_files and not fname.startswith("./.togepi/COMMIT")]
+    filepaths = [fname for fname in filepaths if os.path.isfile(
+        fname) and fname not in ignored_files and not fname.startswith("./.togepi/COMMIT")]
 
     new_tracked_files = list()
     for f in filepaths:
@@ -187,10 +189,11 @@ def commit(cache, message=None):
         check, adds, dels = checkFileIsModified(diff)
         if check:
             modified_files[fname] = diff
-            last_modified_time = datetime.utcfromtimestamp(os.path.getmtime(fname))
+            last_modified_time = datetime.utcfromtimestamp(
+                os.path.getmtime(fname))
             dbUtils.updateFileModifiedTime(repo_id, fname, last_modified_time)
 
-            num_files_changed+= 1
+            num_files_changed += 1
             num_diffs["add"] += adds
             num_diffs["del"] += dels
 
@@ -219,7 +222,7 @@ def push(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
-    
+
     current_time = datetime.utcnow()
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     for fname in tracked_files:
@@ -235,12 +238,13 @@ def pull(cache):
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
 
-    most_recent_cloud_commit_time = fsUtils.getRecentCloudCommitTime(f"/{username}/{repo_name}/.togepi")
+    most_recent_cloud_commit_time = fsUtils.getRecentCloudCommitTime(
+        f"/{username}/{repo_name}/.togepi")
     most_recent_local_commit_time = fsUtils.getRecentLocalCommitTime()
 
     if most_recent_cloud_commit_time is None:   # check other way round
         print("No commits have been pushed to repository.")
-    elif most_recent_local_commit_time is None: # check other way round
+    elif most_recent_local_commit_time is None:  # check other way round
         print("No commits have been created.")
     else:
         if most_recent_cloud_commit_time == most_recent_local_commit_time:
@@ -264,10 +268,21 @@ def status(cache):
         cloud_content = fsUtils.getContent(cloud_file_path)
         diff = getDiff(cloud_content, local_content)
         if checkFileIsModified(diff):
-            last_modified_time = datetime.utcfromtimestamp(os.path.getmtime(fname))
+            last_modified_time = datetime.utcfromtimestamp(
+                os.path.getmtime(fname))
             dbUtils.updateFileModifiedTime(repo_id, fname, last_modified_time)
             print(f"modified: {fname}")
 
     # display if commits are yet to be pushed
     # display if files in repo aren't being tracked
     # display files deleted from local, but present on cloud
+
+
+def clone(cache, clone_path):
+    repo_username, repo_name = clone_path.split("/")
+    repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
+    if repo_status != "public":
+        print("Repository is public. Not available for cloning")
+        return
+    print(f"Cloning repository {repo_name}...")
+    fsUtils.downloadFolder(repo_username, repo_name)

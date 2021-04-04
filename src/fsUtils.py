@@ -36,7 +36,7 @@ def uploadFile(local_path, dropbox_path):
 def ls_dropbox(dropbox_path=""):
     files = list()
     for entry in dbx.files_list_folder(dropbox_path).entries:
-        print(entry.name)
+        #print(entry.name)
         files.append(entry.name)
     return files
 

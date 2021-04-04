@@ -93,11 +93,13 @@ def checkCommandRepository(command):
     create_repo_command = re.compile(r"tgp init ([A-Za-z0-9_]*)")
     add_files_command = re.compile(r"tgp add (( *[A-Za-z0-9._]*)*)")
     commit_files_command = re.compile(r"tgp commit ([A-Za-z0-9_]*)")
+    clone_command = re.compile(r"tgp clone ([A-Za-z0-9_]*/[A-Za-z0-9_]*)")
 
     repo_function_mapping = {
         create_repo_command: repoUtils.init,
         add_files_command: repoUtils.add,
-        commit_files_command: repoUtils.commit
+        commit_files_command: repoUtils.commit,
+        clone_command: repoUtils.clone
     }
 
     if command == "tgp push":

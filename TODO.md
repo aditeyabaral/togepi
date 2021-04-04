@@ -10,7 +10,6 @@
     * Count number of commits behind cloud
 
 4. `tgp clone`
-    * TBD -- NOT PRIORITY
     * tgp clone username/repo_name
         * check if repo is public/ you are collaborator (remove collab check for now)
         * clone
