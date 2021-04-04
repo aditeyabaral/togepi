@@ -4,7 +4,8 @@ import os
 import dotenv
 from glob import glob
 from datetime import datetime
-
+import zipfile
+import cliUtils
 
 dotenv.load_dotenv()
 dbx = dropbox.Dropbox(os.environ["DROPBOX_ACC_TOK"])
@@ -68,7 +69,8 @@ def getRecentCloudCommitTime(dropbox_path):
     all_commits = ls_dropbox(dropbox_path)
     all_commits.remove("tgpinfo.txt")
     times = list(map(lambda x: x.split('--')[-1], all_commits))
-    times = list(map(lambda x: datetime.strptime(x, "%Y-%m-%d-%H:%M:%S"), times))
+    times = list(map(lambda x: datetime.strptime(
+        x, "%Y-%m-%d-%H:%M:%S"), times))
     return times[-1]
 
 
@@ -76,5 +78,20 @@ def getRecentLocalCommitTime():
     all_commits = os.listdir(".togepi/")
     all_commits.remove("tgpinfo.txt")
     times = list(map(lambda x: x.split('--')[-1], all_commits))
-    times = list(map(lambda x: datetime.strptime(x, "%Y-%m-%d-%H:%M:%S"), times))
+    times = list(map(lambda x: datetime.strptime(
+        x, "%Y-%m-%d-%H:%M:%S"), times))
     return times[-1]
+
+
+def downloadFolder(reponame, dropbox_path):
+    cliUtils.cd("..")
+    local_path = os.getcwd()
+    print("LOCALPATH IS", local_path)
+    try:
+        local_zip_path = local_path + f"/{reponame}.zip"
+        dbx.files_download_zip_to_file(local_zip_path, dropbox_path)
+        os.system(f"unzip {reponame}.zip")
+        cliUtils.cd(f"{reponame}")
+    except Exception as e:
+        print("Could not pull! Error occured!")
+        print(str(e))
