@@ -68,30 +68,34 @@ def uploadFolder(local_path, dropbox_path):
 def getRecentCloudCommitTime(dropbox_path):
     all_commits = ls_dropbox(dropbox_path)
     all_commits.remove("tgpinfo.txt")
-    times = list(map(lambda x: x.split('--')[-1], all_commits))
-    times = list(map(lambda x: datetime.strptime(
-        x, "%Y-%m-%d-%H:%M:%S"), times))
-    return times[-1]
+    if all_commits:
+        times = list(map(lambda x: x.split('--')[-1], all_commits))
+        times = list(map(lambda x: datetime.strptime(
+            x, "%Y-%m-%d-%H:%M:%S"), times))
+        return times[-1]
+    return None
 
 
 def getRecentLocalCommitTime():
     all_commits = os.listdir(".togepi/")
     all_commits.remove("tgpinfo.txt")
-    times = list(map(lambda x: x.split('--')[-1], all_commits))
-    times = list(map(lambda x: datetime.strptime(
-        x, "%Y-%m-%d-%H:%M:%S"), times))
-    return times[-1]
+    if all_commits:
+        times = list(map(lambda x: x.split('--')[-1], all_commits))
+        times = list(map(lambda x: datetime.strptime(
+            x, "%Y-%m-%d-%H:%M:%S"), times))
+        return times[-1]
+    return None
 
 
-def downloadFolder(reponame, dropbox_path):
+def downloadFolder(username, repo_name):
     cliUtils.cd("..")
     local_path = os.getcwd()
-    print("LOCALPATH IS", local_path)
+    dropbox_path = f"/{username}/{repo_name}"
     try:
-        local_zip_path = local_path + f"/{reponame}.zip"
+        local_zip_path = local_path + f"/{repo_name}.zip"
         dbx.files_download_zip_to_file(local_zip_path, dropbox_path)
-        os.system(f"unzip {reponame}.zip")
-        cliUtils.cd(f"{reponame}")
-    except Exception as e:
-        print("Could not pull! Error occured!")
-        print(str(e))
+        os.system(f"unzip -o {repo_name}.zip")
+        os.remove(f"{repo_name}.zip")
+        cliUtils.cd(f"{repo_name}")
+    except:
+        print("Could not pull. Error occured.")

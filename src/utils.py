@@ -103,6 +103,9 @@ def checkCommandRepository(command):
     if command == "tgp push":
         return True, repoUtils.push, None
 
+    if command == "tgp pull":
+        return True, repoUtils.pull, None
+
     if command == "tgp status":
         return True, repoUtils.status, None
 

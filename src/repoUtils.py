@@ -238,11 +238,16 @@ def pull(cache):
     most_recent_cloud_commit_time = fsUtils.getRecentCloudCommitTime(f"/{username}/{repo_name}/.togepi")
     most_recent_local_commit_time = fsUtils.getRecentLocalCommitTime()
 
-    if most_recent_cloud_commit_time == most_recent_local_commit_time:
-        print("No changes to pull, repository is upto date.")
+    if most_recent_cloud_commit_time is None:   # check other way round
+        print("No commits have been pushed to repository.")
+    elif most_recent_local_commit_time is None: # check other way round
+        print("No commits have been created.")
     else:
-        print("Pulling changes...")
-        #finish this
+        if most_recent_cloud_commit_time == most_recent_local_commit_time:
+            print("No changes to pull, repository is upto date.")
+        else:
+            print("Pulling changes...")
+            fsUtils.downloadFolder(username, repo_name)
 
 
 def status(cache):
@@ -253,7 +258,7 @@ def status(cache):
     tracked_files = dbUtils.getTrackedFiles(repo_id)
 
     for fname in tracked_files:
-        with open(fname) as f:
+        with open(fname) as f:  # if new file is added but not in local -> error
             local_content = f.read()
         cloud_file_path = f"/{username}/{repo_name}/{fname[2:]}"
         cloud_content = fsUtils.getContent(cloud_file_path)
