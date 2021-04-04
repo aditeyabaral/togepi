@@ -85,7 +85,6 @@ def createCommit(_id, developer_id, repository_id, time, file_id, message=None):
     query = commit_table.insert().values(_id=_id, developer_id=developer_id,
                                          repository_id=repository_id, time=time, file_id=file_id, message=message)
     result = connection.execute(query)
-    # print("Changes committed.")
 
 
 def checkUserCredentials(username, password):
@@ -127,3 +126,39 @@ def createUserRepositoryRelation(user_id, repo_id, relation="owner"):
     query = repo_user_table.insert().values(developer_id=user_id,
                                             repository_id=repo_id, relation=relation)
     result = connection.execute(query)
+
+
+def updateFileModifiedTime(repo_id, fname, last_modified_time):
+    query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
+                                           file_table.c.path == fname)).values(last_modified=last_modified_time)
+
+    result = connection.execute(query)
+
+    query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
+                                           file_table.c.path == fname)).values(status="modified")
+    result = connection.execute(query)
+
+
+def updateFileCommitTime(repo_id, modified_file, last_committed_time):
+    query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
+                                           file_table.c.path == modified_file)).values(last_committed=last_committed_time)
+    result = connection.execute(query)
+
+
+def updateFilePushTime(repo_id, filename, last_pushed_time):
+    query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
+                                           file_table.c.path == filename)).values(last_pushed=last_pushed_time)
+
+    result = connection.execute(query)
+
+    query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
+                                           file_table.c.path == filename)).values(status="unchanged")
+    result = connection.execute(query)
+
+
+def getLastModifyTime(repo_id, fname):
+    query = file_table.select().where(
+        and_(file_table.c.repository_id == repo_id, file_table.c.path == fname))
+    result = connection.execute(query).fetchall()
+    print(result)
+    return result[0][4]

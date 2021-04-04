@@ -6,11 +6,11 @@ import validationUtils
 def generateUserID():
     all_users = dbUtils.getAllUserID()
     if not all_users:
-        user_id = "USER#000001"
+        user_id = "USER000001"
     else:
         roll_numbers = sorted([int(i[0][5:]) for i in all_users])
         new_roll_number = str(roll_numbers[-1] + 1)
-        user_id = f"USER#{new_roll_number.zfill(6)}"
+        user_id = f"USER{new_roll_number.zfill(6)}"
     return user_id
 
 
@@ -35,7 +35,6 @@ def createUser():
 
 
 def loginUser(username, password):
-    # Check if credentials are right -- return values based on that
     user_id = dbUtils.checkUserCredentials(username, password)
     if user_id is None:
         username = None

@@ -3,6 +3,7 @@ import dropbox
 import os
 import dotenv
 from glob import glob
+from datetime import datetime
 
 
 dotenv.load_dotenv()
@@ -32,8 +33,11 @@ def uploadFile(local_path, dropbox_path):
 
 
 def ls_dropbox(dropbox_path=""):
+    files = list()
     for entry in dbx.files_list_folder(dropbox_path).entries:
         print(entry.name)
+        files.append(entry.name)
+    return files
 
 
 def createFolder(dropbox_path):
@@ -58,3 +62,19 @@ def uploadFolder(local_path, dropbox_path):
             print(f'Uploading {rel_path}')
             dbx.files_upload(f.read(), dropbox_file_path,
                              mode=dropbox.files.WriteMode.overwrite)
+
+
+def getRecentCloudCommitTime(dropbox_path):
+    all_commits = ls_dropbox(dropbox_path)
+    all_commits.remove("tgpinfo.txt")
+    times = list(map(lambda x: x.split('--')[-1], all_commits))
+    times = list(map(lambda x: datetime.strptime(x, "%Y-%m-%d-%H:%M:%S"), times))
+    return times[-1]
+
+
+def getRecentLocalCommitTime():
+    all_commits = os.listdir(".togepi/")
+    all_commits.remove("tgpinfo.txt")
+    times = list(map(lambda x: x.split('--')[-1], all_commits))
+    times = list(map(lambda x: datetime.strptime(x, "%Y-%m-%d-%H:%M:%S"), times))
+    return times[-1]

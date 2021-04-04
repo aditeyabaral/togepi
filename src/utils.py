@@ -4,10 +4,6 @@ import cliUtils
 import userUtils
 import repoUtils
 
-# current_user = None
-# current_repository_id = None
-# current_repository_name = None
-
 cache = {
     "current_user_id": None,
     "current_username": None,
@@ -24,7 +20,7 @@ def setGlobalUserDetails():
 def setGlobalRepositoryDetails():
     global cache
     if ".togepi" in os.listdir():
-        with open(".togepi/info.txt") as f:
+        with open(".togepi/tgpinfo.txt") as f:
             content = f.read().strip().split('\n')
             _, current_repository_id = content[0].split(',')
             current_repository_id = current_repository_id.strip()
@@ -107,6 +103,9 @@ def checkCommandRepository(command):
     if command == "tgp push":
         return True, repoUtils.push, None
 
+    if command == "tgp status":
+        return True, repoUtils.status, None
+
     for command_type in repo_function_mapping:
         args = re.findall(command_type, command)
         if args:
@@ -117,23 +116,12 @@ def checkCommandRepository(command):
 
 def runCommand(command):
 
-    # global current_user
-    # global current_repository_id
-    # global current_repository_name
     global cache
-    # print(cache)
 
     function_found, cli_command, args = checkCommandCLI(command)
     if function_found:
         cli_command(args)
         setGlobalRepositoryDetails()
-        # if ".togepi" in os.listdir():
-        #     with open(".togepi/info.txt") as f:
-        #         content = f.read().strip().split('\n')
-        #         _, current_repository_id = content[0].split(',')
-        #         current_repository_id = current_repository_id.strip()
-        #         _, current_repository_name = content[1].split(',')
-        #         current_repository_name = current_repository_name.strip()
         return
 
     function_found, user_command, args = checkCommandUser(command)
@@ -152,12 +140,6 @@ def runCommand(command):
         print("Please login before performing repository functions.")
     else:
         if function_found:
-            # if repo_command == repoUtils.add:
-            #     repoUtils.add(current_user, current_repository_id, args)
-            # elif repo_command == repoUtils.push:
-            #     repoUtils.push(current_user, current_repository_name)
-            # else:
-            #     repo_command(current_user, current_repository_name, args)
             if args is None:
                 repo_command(cache)
             else:
