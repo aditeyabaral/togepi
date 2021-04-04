@@ -1,5 +1,0 @@
-./.tgpignore
-
-+ ./ig.txt
-+ ./ignorefolder
-  
