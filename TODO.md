@@ -11,8 +11,8 @@
 
 4. `tgp clone`
     * tgp clone username/repo_name
-        * check if repo is public/ you are collaborator (remove collab check for now)
-        * clone
+        * check if you are collaborator (remove collab check for now)
+      
 
 
 4. Add CLI commands
