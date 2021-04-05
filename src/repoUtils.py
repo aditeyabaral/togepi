@@ -89,6 +89,16 @@ collaborators,'''
     with open(f"{repo_name}/.togepi/tgpinfo.txt", "w") as f:
         f.write(content)
 
+def getRepoOwner(repo_id):
+    relations = dbUtils.getAllRelations(repo_id)
+    owner = ''
+    for relation in relations:
+        if relation[-1] == "owner":
+            owner_id = relation[0]
+            break
+    owner_name = dbUtils.getUsername(owner_id)
+    return owner, owner_name
+
 
 def init(cache, repo_name):
     user_id = cache["current_user_id"]
@@ -174,6 +184,8 @@ def commit(cache, message=None):
     repo_id = cache["current_repository_id"]
     repo_name = cache["current_repository_name"]
 
+    owner_id, owner_name = getRepoOwner(repo_id)
+
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     modified_files = dict()
 
@@ -183,7 +195,7 @@ def commit(cache, message=None):
     for fname in tracked_files:
         with open(fname) as f:
             local_content = f.read()
-        cloud_file_path = f"/{username}/{repo_name}/{fname[2:]}"
+        cloud_file_path = f"/{owner_name}/{repo_name}/{fname[2:]}"
         cloud_content = fsUtils.getContent(cloud_file_path)
         diff = getDiff(cloud_content, local_content)
         check, adds, dels = checkFileIsModified(diff)
@@ -222,14 +234,14 @@ def push(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
-
+    owner_id, owner_name = getRepoOwner(repo_id)
     current_time = datetime.utcnow()
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     for fname in tracked_files:
         dbUtils.updateFilePushTime(repo_id, fname, current_time)
 
     local_path = f"../{repo_name}"
-    dropbox_path = f"/{username}/{repo_name}/"
+    dropbox_path = f"/{owner_name}/{repo_name}/"
     fsUtils.uploadFolder(local_path, dropbox_path)
 
 
@@ -258,13 +270,13 @@ def status(cache):
     username = cache["current_username"]
     repo_id = cache["current_repository_id"]
     repo_name = cache["current_repository_name"]
-
+    owner_id, owner_name = getRepoOwner(repo_id)
     tracked_files = dbUtils.getTrackedFiles(repo_id)
 
     for fname in tracked_files:
         with open(fname) as f:  # if new file is added but not in local -> error
             local_content = f.read()
-        cloud_file_path = f"/{username}/{repo_name}/{fname[2:]}"
+        cloud_file_path = f"/{owner_name}/{repo_name}/{fname[2:]}"
         cloud_content = fsUtils.getContent(cloud_file_path)
         diff = getDiff(cloud_content, local_content)
         if checkFileIsModified(diff):
@@ -280,12 +292,45 @@ def status(cache):
 
 def clone(cache, clone_path):
     repo_username, repo_name = clone_path.split("/")
-    repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
+    repo_id, repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
     if repo_status != "public":
-        print("Repository is private. Not available for cloning")
+        user_id = cache["current_user_id"]
+        #print("Trying to clone", repo_id, user_id)
+        relations = dbUtils.getAllRelations(repo_id)
+        found_user = False
+        for relation in relations:
+            if relation[0]==user_id:
+                repo_relation = relation[-1]
+                found_user = True
+                break
+        if not found_user:
+            print(f"You are not a collaborator on {repo_name}. Cannot pull private repo")
+        else:
+            print(f"Cloning repository {repo_name}...")
+            fsUtils.downloadFolder(repo_username, repo_name)
     else:
         print(f"Cloning repository {repo_name}...")
         fsUtils.downloadFolder(repo_username, repo_name)
+
+def addCollaborator(cache, collab_username):
+    repo_id = cache["current_repository_id"]
+    user_id = cache["current_user_id"]
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id and relation[-1]=="owner":
+            repo_relation = "owner"
+            found_user = True
+            break
+    if not found_user:
+        print("You are not owner of this repository. Cannot add collaborator")
+        return
+    collab_user_id = dbUtils.getUserID(collab_username)
+    if collab_user_id == '':
+        print(
+            f"User {collab_username} does not exist. Please check the username")
+        return
+    dbUtils.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
 
 
 # def fork(cache, clone_path):
