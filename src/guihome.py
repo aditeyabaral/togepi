@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 import userUtils
 import repoUtils
+import validationUtils
 
 cache = {
     "current_user_id": None,
@@ -48,7 +49,7 @@ class HomeApp:
         self.signup_button_choice = Button(
             self.root,
             text="SIGN UP",
-            # command=self.signUp,
+            command=self.signUp,
             bg="#4759b8",
             fg="white",
             font=("Comfortaa", 15),
@@ -94,7 +95,23 @@ class HomeApp:
             self.onCloseRoot()
             MainApp(self.user_id, self.username)
             
-
+    def verifySignupCredentials(self):
+        self.username = self.username_entry.get()
+        self.password = self.password_entry.get()
+        self.email = self.email_entry.get()
+        unamevalidate = validationUtils.validateUsername(self.username)
+        pwdvalidate = validationUtils.validatePassword(self.password)
+        emailvalidate = validationUtils.validateEmail(self.email)
+        if not (unamevalidate and pwdvalidate and emailvalidate):
+            self.validation_str.set("Sign-In Failed!")
+        else:
+            cache["current_user_id"] = self.user_id
+            cache["current_username"] = self.username
+            UserId = userUtils.generateUserID()
+            userUtils.createUserGUI(UserId, self.username, self.password, self.email)
+            self.onCloseWindow()
+            self.onCloseRoot()
+            MainApp(self.user_id, self.username)
 
     def logIn(self):
         self.window = Tk()
@@ -162,6 +179,84 @@ class HomeApp:
 
         self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
         self.window.mainloop()
+    
+    def signUp(self):
+        self.window = Tk()
+        self.window.title = "Togepi"
+        self.window.configure(background="#d2d2c9")
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Please enter your credentials", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Username", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.username = StringVar()
+        self.username_entry = Entry(self.window, textvariable=self.username)
+        self.username_entry.pack()
+
+        self.welcome = Label(self.window, text="Password", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.password = StringVar()
+        self.password_entry = Entry(self.window, textvariable=self.password)
+        self.password_entry.pack()
+
+        self.welcome = Label(self.window, text="E-Mail", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.email = StringVar()
+        self.email_entry = Entry(self.window, textvariable=self.email)
+        self.email_entry.pack()
+
+        self.validation_str = StringVar()
+        self.validation_str.set("hello")
+        self.validation_login = Message(self.window, textvariable=self.validation_str, background="#d2d2c9")
+        self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.validation_login.pack()
+
+        self.signup_button = Button(
+            self.window,
+            text="LOGIN",
+            command=self.verifySignupCredentials,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.signup_button.config(height=2, width=30, borderwidth=0)
+        self.signup_button.pack(side=TOP, expand=1)
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
+        self.window.mainloop()
+
+
+
+
+        
 
 
 class MainApp():
@@ -401,10 +496,10 @@ class MainApp():
         description = self.repo_desc_entry.get()
         visibility = self.radio_var.get()
         status = repoUtils.initGUI(cache, repo_name, description, visibility)
-        if status:
+        if status[0]:
             pass
-            # do something
         else:
+            #Error in creating repo
             pass
             # do something
 

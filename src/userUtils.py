@@ -33,6 +33,10 @@ def createUser():
     fsUtils.createFolder(username)
     return user_id, username
 
+def createUserGUI(user_id, username, password, email):
+    dbUtils.createUser(user_id, username, email, password)
+    fsUtils.createFolder(username)
+    return user_id, username
 
 def loginUser(username, password):
     user_id = dbUtils.checkUserCredentials(username, password)

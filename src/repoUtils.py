@@ -146,10 +146,10 @@ def initGUI(cache, repo_name, description=None, visibility="public"):
     username = cache["current_username"]
     if dbUtils.checkUserRepositoryExists(user_id, repo_name):
         print("Repository names have to be unique per user.")
-        return False
+        return False, 1
     if len(repo_name) > 50:
         print("Repository Name cannot be over 50 chars long")
-        return False
+        return False, 2
     cliUtils.mkdir(repo_name)
     cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
     repo_id = generateRepositoryID()
@@ -173,7 +173,7 @@ def initGUI(cache, repo_name, description=None, visibility="public"):
     # before uploading track the info file
     local_path = os.path.join(os.getcwd(), repo_name)
     fsUtils.uploadFolder(local_path, dropbox_path)
-    return True
+    return True, 0
 
 
 def add(cache, filepaths):
