@@ -32,6 +32,14 @@ def getUsername(user_id):
     result = connection.execute(query).fetchall()[0][1]
     return result
 
+def getUserID(username):
+    query = dev_table.select().where(dev_table.c.username == username)
+    result = connection.execute(query).fetchall()
+    for row in result:
+        if row[1] == username:
+            return row[0]
+    return ''
+
 
 def getAllUsername():
     all_users = session.query(dev_table.columns.username).all()
@@ -127,6 +135,16 @@ def createUserRepositoryRelation(user_id, repo_id, relation="owner"):
                                             repository_id=repo_id, relation=relation)
     result = connection.execute(query)
 
+def getUserRepositoryRelation(user_id, repo_id):
+    query = repo_user_table.select().where(and_(repo_user_table.c.developer_id == user_id, repo_user_table.c.repo_id == repo_id))
+    result = connection.execute(query).fetchall()
+    return result
+
+def getAllRelations(repo_id):
+    query = repo_user_table.select().where(repo_user_table.c.repository_id == repo_id)
+    result = connection.execute(query).fetchall()
+    return result
+
 
 def updateFileModifiedTime(repo_id, fname, last_modified_time):
     query = file_table.update().where(and_(file_table.c.repository_id == repo_id,
@@ -172,4 +190,4 @@ def getRepoStatus(repo_owner, repo_name):
     )
 
     result = connection.execute(query).fetchall()
-    return result[0][5]
+    return result[0][0], result[0][5]
