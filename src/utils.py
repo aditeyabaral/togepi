@@ -53,6 +53,9 @@ def checkCommandCLI(command):
     if command == "help":
         return True, cliUtils.help, None
 
+    if command == "togepi":
+        return True, cliUtils.togepi, None
+
     if command == "ls":
         return True, cli_function_mapping[ls_command], "."
 
