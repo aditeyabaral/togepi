@@ -141,6 +141,41 @@ def init(cache, repo_name):
     return True
 
 
+def initGUI(cache, repo_name, description=None, visibility="public"):
+    user_id = cache["current_user_id"]
+    username = cache["current_username"]
+    if dbUtils.checkUserRepositoryExists(user_id, repo_name):
+        print("Repository names have to be unique per user.")
+        return False
+    if len(repo_name) > 50:
+        print("Repository Name cannot be over 50 chars long")
+        return False
+    cliUtils.mkdir(repo_name)
+    cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
+    repo_id = generateRepositoryID()
+    #     description = input("Enter repository description (under 150 chars): ")
+    #     if len(description) > 150:
+    #         print("Description must be under 150 chars. Truncating description..")
+    #         description = description[:150]
+    url = f"/{username}/{repo_name}"
+    create_time = datetime.utcnow()
+    # if visibility not in ["public", "private"]:
+    #     print("Invalid option. Resetting to public.")
+    #     visibility = "public"
+
+    createInfoFile(user_id, repo_name, repo_id, description,
+                   url, create_time, visibility)
+    dbUtils.createRepository(user_id, repo_name, repo_id,
+                             description, url, create_time, visibility)
+    dbUtils.createUserRepositoryRelation(user_id, repo_id)
+
+    dropbox_path = f"/{username}/{repo_name}/"
+    # before uploading track the info file
+    local_path = os.path.join(os.getcwd(), repo_name)
+    fsUtils.uploadFolder(local_path, dropbox_path)
+    return True
+
+
 def add(cache, filepaths):
 
     # check if user_id is collaborator/owner
@@ -356,12 +391,15 @@ def clone(cache, clone_path):
                 break
         if not found_user:
             print(f"You are not a collaborator on {repo_name}. Cannot clone private repository")
+            return False
         else:
             print(f"Cloning repository {repo_name}...")
             fsUtils.downloadFolder(repo_username, repo_name)
+            return True
     else:
         print(f"Cloning repository {repo_name}...")
         fsUtils.downloadFolder(repo_username, repo_name)
+        return True
 
 def addCollaborator(cache, collab_username):
     repo_id = cache["current_repository_id"]
