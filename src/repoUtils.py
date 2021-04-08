@@ -106,7 +106,9 @@ def init(cache, repo_name):
     if dbUtils.checkUserRepositoryExists(user_id, repo_name):
         print("Repository names have to be unique per user.")
         return False
-
+    if len(repo_name) > 50:
+        print("Repository Name cannot be over 50 chars long")
+        return False
     cliUtils.mkdir(repo_name)
     cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
     repo_id = generateRepositoryID()
@@ -114,7 +116,10 @@ def init(cache, repo_name):
     if description.lower() == 'n':
         description = None
     else:
-        description = input("Enter repository description: ")
+        description = input("Enter repository description (under 150 chars): ")
+        if len(description) > 150:
+            print("Description must be under 150 chars. Truncating description..")
+            description = description[:150]
     url = f"/{username}/{repo_name}"
     create_time = datetime.utcnow()
     visibility = input("Enter repository visibility [public/private]: ")
