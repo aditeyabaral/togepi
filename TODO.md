@@ -7,11 +7,8 @@
     * Update last_committed for tgpinfo.txt -- NOT PRIORITY
 
 3. `tgp pull`
-    * Count number of commits behind cloud
+    * Count number of commits behind cloud -- NOT PRIORITY
 
-4. `tgp clone`
-    * tgp clone username/repo_name
-        * check if you are collaborator (remove collab check for now)
       
 5. Add CLI commands
     * cp
@@ -26,7 +23,7 @@
 
 9. Testing
 
-10. Track .togepi/tgpinfo.txt by default
+10. Track .togepi/tgpinfo.txt by default -- DEBATABLE
 
 11. Deletion of files
 

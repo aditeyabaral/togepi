@@ -309,7 +309,7 @@ def clone(cache, clone_path):
                 found_user = True
                 break
         if not found_user:
-            print(f"You are not a collaborator on {repo_name}. Cannot pull private repo")
+            print(f"You are not a collaborator on {repo_name}. Cannot clone private repository")
         else:
             print(f"Cloning repository {repo_name}...")
             fsUtils.downloadFolder(repo_username, repo_name)
