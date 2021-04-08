@@ -145,9 +145,18 @@ def add(cache, filepaths):
 
     # check if user_id is collaborator/owner
     # check if files were deleted -- untrack these files by deleting from db (and dropbox folder)
-
+    user_id = cache["current_user_id"]
     repo_id = cache["current_repository_id"]
-
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id:
+            repo_relation = relation[-1]
+            found_user = True
+            break
+    if not found_user:
+        print("You do not have access to this repository. Cannot add files")
+        return 
     if filepaths == ".":
         filepaths = [os.path.join(parent, name) for (
             parent, subdirs, files) in os.walk(".") for name in files + subdirs]
@@ -190,7 +199,16 @@ def commit(cache, message=None):
     repo_name = cache["current_repository_name"]
 
     owner_id, owner_name = getRepoOwner(repo_id)
-
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id:
+            repo_relation = relation[-1]
+            found_user = True
+            break
+    if not found_user:
+        print("You do not have commit access to this repository.")
+        return 
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     modified_files = dict()
 
@@ -239,6 +257,16 @@ def push(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id:
+            repo_relation = relation[-1]
+            found_user = True
+            break
+    if not found_user:
+        print("You do not have push access to this repository.")
+        return
     owner_id, owner_name = getRepoOwner(repo_id)
     current_time = datetime.utcnow()
     tracked_files = dbUtils.getTrackedFiles(repo_id)
@@ -254,7 +282,16 @@ def pull(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
-
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id:
+            repo_relation = relation[-1]
+            found_user = True
+            break
+    if not found_user:
+        print("You do not have pull access on this repository.")
+        return
     most_recent_cloud_commit_time = fsUtils.getRecentCloudCommitTime(
         f"/{username}/{repo_name}/.togepi")
     most_recent_local_commit_time = fsUtils.getRecentLocalCommitTime()
@@ -277,7 +314,16 @@ def status(cache):
     repo_name = cache["current_repository_name"]
     owner_id, owner_name = getRepoOwner(repo_id)
     tracked_files = dbUtils.getTrackedFiles(repo_id)
-
+    relations = dbUtils.getAllRelations(repo_id)
+    found_user = False
+    for relation in relations:
+        if relation[0]==user_id:
+            repo_relation = relation[-1]
+            found_user = True
+            break
+    if not found_user:
+        print("You do not have access on this repository. Cannot see status")
+        return
     for fname in tracked_files:
         with open(fname) as f:  # if new file is added but not in local -> error
             local_content = f.read()
@@ -338,11 +384,3 @@ def addCollaborator(cache, collab_username):
     dbUtils.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
 
 
-# def fork(cache, clone_path):
-#     repo_username, repo_name = clone_path.split("/")
-#     repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
-#     if repo_status != "public":
-#         print("Repository is public. Not available for cloning")
-#     else:
-#         print(f"Cloning repository {repo_name}...")
-#         fsUtils.downloadFolder(repo_username, repo_name)
