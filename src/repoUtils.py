@@ -257,6 +257,7 @@ def push(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
+    user_id = cache["current_user_id"]
     relations = dbUtils.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
@@ -282,6 +283,7 @@ def pull(cache):
     repo_id = cache["current_repository_id"]
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
+    user_id = cache["current_user_id"]
     relations = dbUtils.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
@@ -312,6 +314,7 @@ def status(cache):
     username = cache["current_username"]
     repo_id = cache["current_repository_id"]
     repo_name = cache["current_repository_name"]
+    user_id = cache["current_user_id"]
     owner_id, owner_name = getRepoOwner(repo_id)
     tracked_files = dbUtils.getTrackedFiles(repo_id)
     relations = dbUtils.getAllRelations(repo_id)
