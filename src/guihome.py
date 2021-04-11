@@ -6,6 +6,7 @@ import repoUtils
 import validationUtils
 import cliUtils
 import os
+os.environ["APP_DIR"] = os.getcwd()
 
 cache = {
     "current_user_id": None,
@@ -946,7 +947,7 @@ class RepositoryApp:
         self.exit_button_choice = Button(
             self.left_frame,
             text="BACK",
-            command=self.loadMain,#handle this
+            command=self.loadMain,  # handle this
             bg="#4759b8",
             fg="white",
             font=("Comfortaa", 15),
@@ -967,10 +968,10 @@ class RepositoryApp:
         self.root.protocol("WM_DELETE_WINDOW", self.onCloseRoot)
         self.root.mainloop()
 
-
     def loadMain(self):
         global cache
         self.onCloseRoot()
+        os.chdir(os.environ["APP_DIR"])
         cache["current_repository_id"] = None
         cache["current_repository_name"] = None
         MainApp(cache["current_user_id"], cache["current_username"])
