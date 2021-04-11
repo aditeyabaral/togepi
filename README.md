@@ -301,7 +301,7 @@ Additional screenshots have been added to `img/gui` for reference.
 
 # Contributing to Togepi
 
-Contributions to Togepi are welcome, in the form of bug fixes as well as feature enhancements. We look forward to adding more features to the CLI, such as `forks` and `braches`.
+Contributions to Togepi are welcome, in the form of bug fixes as well as feature enhancements. We look forward to adding more features to the CLI, such as `forks` and `branches`.
 
 # Acknowledgements
 
