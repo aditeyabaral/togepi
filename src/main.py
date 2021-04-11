@@ -1,6 +1,9 @@
 import sys
 import utils
+from cliUtils import togepi
 
+print("Welcome to Togepi!")
+togepi()
 
 while True:
     command = input(">>> ")
