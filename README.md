@@ -72,7 +72,7 @@ To run Togepi using a GUI, run `python3 src/gui.py`. The interface itself is eas
   <img src="img/gui/gui-repo.png">
 </p>
 
-Additional screenshots have been added to `img/gui/gui` for reference.
+Additional screenshots have been added to `img/gui` for reference.
 
 # Contributing to Togepi
 
