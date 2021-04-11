@@ -13,7 +13,7 @@ Togepi supports most major version control features such as `add`, `commit`, `pu
 The GUI interface is basic and supports only the core features. There are no plans to extend work on the GUI since the interface was included as a course deliverable.
 
 # Setting up Togepi
-1. Create a virtual environment using virtualenv
+1. Create a virtual environment using `virtualenv`
 ```bash
 virtualenv togepi
 source togepi/bin/activate

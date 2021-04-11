@@ -13,4 +13,4 @@ while True:
         try:
             utils.runCommand(command)
         except Exception as e:
-            print(e)
+            print("Invalid command. Type help to learn more.\nYou can also visit https://github.com/aditeyabaral/togepi#how-to-use-togepi to read the entire documentation.")
