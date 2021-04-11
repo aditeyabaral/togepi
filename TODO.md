@@ -1,9 +1,10 @@
 1. Add CLI commands
-    * cp
-    * mv
-    * rm
+    * cp - add to README after finishing
+    * mv- add to README after finishing
+    * rm- add to README after finishing
     * help
     * test if CLI is working
+    * handle wrong command
 
 2. Remove redundant prints
 

@@ -444,5 +444,6 @@ def addCollaborator(cache, collab_username):
             f"User {collab_username} does not exist. Please check the username")
         return
     relationDB.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
+    print(f"User {collab_username} successfully added as collaborator.")
 
 
