@@ -14,12 +14,11 @@
     * cp
     * mv
     * rm
+    * help
 
 5. Code cleanup
 
 6. README
-
-7. help command
 
 8. Testing
 
@@ -28,4 +27,3 @@
 
 10. GUI
     * formatting of content
-    * give option to create repo, clone repo
