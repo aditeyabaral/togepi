@@ -80,6 +80,19 @@ class HomeApp:
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
 
+        self.exit_button_choice = Button(
+            self.root,
+            text="EXIT",
+            command=self.onCloseRoot,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
         self.root.protocol("WM_DELETE_WINDOW", self.onCloseRoot)
         self.root.mainloop()
 
@@ -188,12 +201,15 @@ class HomeApp:
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
 
-        self.validation_str = StringVar()
-        self.validation_str.set("hello")
-        self.validation_login = Message(
-            self.window, textvariable=self.validation_str, background="#d2d2c9")
-        self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.validation_login.pack()
+        # self.validation_str = StringVar()
+        # self.validation_str.set("hello")
+        # self.validation_login = Message(
+        #     self.window, textvariable=self.validation_str, background="#d2d2c9")
+        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
+        # self.validation_login.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
 
         self.login_button = Button(
             self.window,
@@ -208,12 +224,25 @@ class HomeApp:
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
 
+        self.exit_button_choice = Button(
+            self.window,
+            text="BACK",
+            command=self.onCloseWindow,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
         self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
         self.window.mainloop()
 
     def signUp(self):
         self.window = Tk()
-        self.window.title = "Togepi"
+        self.window.title("Togepi")
         self.window.configure(background="#d2d2c9")
 
         self.blank = Label(self.window, bg="#d2d2c9")
@@ -252,7 +281,7 @@ class HomeApp:
         self.blank.pack()
 
         self.password = StringVar()
-        self.password_entry = Entry(self.window, textvariable=self.password)
+        self.password_entry = Entry(self.window, textvariable=self.password, show='*')
         self.password_entry.pack()
 
         self.welcome = Label(self.window, text="E-Mail", background="#d2d2c9")
@@ -265,12 +294,15 @@ class HomeApp:
         self.email_entry = Entry(self.window, textvariable=self.email)
         self.email_entry.pack()
 
-        self.validation_str = StringVar()
-        self.validation_str.set("hello")
-        self.validation_login = Message(
-            self.window, textvariable=self.validation_str, background="#d2d2c9")
-        self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.validation_login.pack()
+        # self.validation_str = StringVar()
+        # self.validation_str.set("hello")
+        # self.validation_login = Message(
+        #     self.window, textvariable=self.validation_str, background="#d2d2c9")
+        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
+        # self.validation_login.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
 
         self.signup_button = Button(
             self.window,
@@ -282,6 +314,19 @@ class HomeApp:
         )
         self.signup_button.config(height=2, width=30, borderwidth=0)
         self.signup_button.pack(side=TOP, expand=1)
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.exit_button_choice = Button(
+            self.window,
+            text="BACK",
+            command=self.onCloseWindow,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
 

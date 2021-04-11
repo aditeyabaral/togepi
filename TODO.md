@@ -27,9 +27,6 @@
 
 
 10. GUI
-    * remove login message label for text
     * formatting of content
-    * login page - add go back and sign up (?)
     * close main choice window once repo is chosen
-    * sign up - password -*
     * sign up page window title
