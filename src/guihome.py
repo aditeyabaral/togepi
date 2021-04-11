@@ -1,8 +1,11 @@
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 import userUtils
 import repoUtils
 import validationUtils
+import cliUtils
+import os
 
 cache = {
     "current_user_id": None,
@@ -12,9 +15,13 @@ cache = {
 }
 
 
+
 def getDirectoryDialog():
+    global cache
     dir_path = filedialog.askdirectory()
-    print(dir_path)
+    info = open(f"{dir_path}/.togepi/tgpinfo.txt", 'r').read().split('\n')
+    cache["current_repository_id"] = info[0].split(",")[1]
+    cache["current_repository_name"] = info[1].split(",")[1]
     return dir_path
 
 
@@ -82,12 +89,13 @@ class HomeApp:
         self.root.destroy()
 
     def verifyLoginCredentials(self):
+        global cache
         self.username = self.username_entry.get()
         self.password = self.password_entry.get()
         self.user_id, self.username = userUtils.loginUser(self.username, self.password)
         print(self.username, self.password)
         if self.username is None:
-            self.validation_str.set("Incorrect username or password")
+            messagebox.showerror("Error", "Incorrect username or password")
         else:
             cache["current_user_id"] = self.user_id
             cache["current_username"] = self.username
@@ -99,15 +107,26 @@ class HomeApp:
         self.username = self.username_entry.get()
         self.password = self.password_entry.get()
         self.email = self.email_entry.get()
+        print(self.username, self.password, self.email)
         unamevalidate = validationUtils.validateUsername(self.username)
         pwdvalidate = validationUtils.validatePassword(self.password)
         emailvalidate = validationUtils.validateEmail(self.email)
-        if not (unamevalidate and pwdvalidate and emailvalidate):
-            self.validation_str.set("Sign-In Failed!")
+        print(unamevalidate, pwdvalidate, emailvalidate)
+        if not (unamevalidate[0] or pwdvalidate or emailvalidate):
+            if not unamevalidate[0]:
+                if unamevalidate[1] == 1:
+                    messagebox.showerror("Error", "Invalid username! No special chars at start or end")
+                elif unamevalidate[1] == 2:
+                    messagebox.showerror("Error", "Username is not unique!")
+            elif not pwdvalidate:
+                messagebox.showerror("Error", "Invalid password!")
+            elif not emailvalidate:
+                messagebox.showerror("Error", "Invalid email address!")
         else:
-            cache["current_user_id"] = self.user_id
             cache["current_username"] = self.username
             UserId = userUtils.generateUserID()
+            cache["current_user_id"] = UserId
+            print(cache)
             userUtils.createUserGUI(UserId, self.username, self.password, self.email)
             self.onCloseWindow()
             self.onCloseRoot()
@@ -239,7 +258,7 @@ class HomeApp:
 
         self.signup_button = Button(
             self.window,
-            text="LOGIN",
+            text="SIGN UP",
             command=self.verifySignupCredentials,
             bg="#4759b8",
             fg="white",
@@ -262,7 +281,7 @@ class HomeApp:
 class MainApp():
     def __init__(self, user_id, username):
         self.root = Tk()
-        self.root.title("Togepi")
+        self.root.title(f"Togepi: {username}")
         self.root.configure(background="#d2d2c9")
         #self.root.geometry("480x640")
 
@@ -276,9 +295,21 @@ class MainApp():
 
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
+
         self.welcome = Label(self.root, text="Togepi", background="#d2d2c9")
         self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
         self.welcome.pack()
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        text_welcome = f"Welcome, {self.username}"
+        self.welcome = Label(self.root, text=text_welcome, background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 20))
+        self.welcome.pack()
+
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
         self.blank = Label(self.root, bg="#d2d2c9")
@@ -341,7 +372,9 @@ class MainApp():
 
     def chooseRepositoryDirectory(self):
         self.dir_path = getDirectoryDialog()
-        # spawn new window with dir
+        print("self.dir_path", self.dir_path)
+        cliUtils.cd(self.dir_path)
+        RepositoryApp(self.dir_path)
 
     def cloneRepository(self):
         self.window = Tk()
@@ -408,14 +441,21 @@ class MainApp():
         self.window.mainloop()
 
     def clone(self):
-        print(cache)
+        global cache
         owner_name = self.username_entry.get()
         repo_name = self.repo_name_entry.get()
         clone_path = f"{owner_name}/{repo_name}"
         status = repoUtils.clone(cache, clone_path)
         if not status:
-            pass
-            #wut2do
+            messagebox.showerror("Error", "You are not a collaborator on this repository, cannot clone")
+        else:
+            self.dir_path = os.getcwd()
+            info = open(f"{self.dir_path}/.togepi/tgpinfo.txt", 'r').read().split('\n')
+            cache["current_repository_id"] = info[0].split(",")[1]
+            cache["current_repository_name"] = info[1].split(",")[1]
+            self.onCloseWindow()
+            self.onCloseRoot()
+            RepositoryApp(self.dir_path)
 
     def createRepository(self):
         self.window = Tk()
@@ -469,7 +509,7 @@ class MainApp():
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
 
-        self.radio_var = StringVar()
+        self.radio_var = StringVar(self.window, "public")
         public_choice_button = Radiobutton(self.window, text="Public", variable=self.radio_var, value="public")  
         public_choice_button.pack() 
         private_choice_button = Radiobutton(self.window, text="Private", variable=self.radio_var, value="private")  
@@ -495,14 +535,26 @@ class MainApp():
         repo_name = self.repo_name_entry.get()
         description = self.repo_desc_entry.get()
         visibility = self.radio_var.get()
+        if repo_name == '' or repo_name is None:
+            messagebox.showerror("Error","Repository Name cannot be empty")
+            self.onCloseWindow()
+        print("CACHE IN CREATE", cache)
         status = repoUtils.initGUI(cache, repo_name, description, visibility)
         if status[0]:
-            pass
+            cache["current_repository_id"] = status[1][0]
+            cache["current_repository_name"] = status[1][1]
+            self.dir_path = status[2]
+            self.onCloseWindow()
+            self.onCloseRoot()
+            print("Repo path (create):", self.dir_path)
+            RepositoryApp(self.dir_path)
         else:
-            #Error in creating repo
-            pass
-            # do something
-
+            if status[1]==1:
+                messagebox.showerror("Error","Repository already exists with that name!")
+                self.onCloseWindow()
+            elif status[1]==2:
+                messagebox.showerror("Error","Repository name must be under 50 chars")
+                self.onCloseWindow()
 
     def logOut(self):
         self.onCloseRoot()
@@ -514,5 +566,377 @@ class MainApp():
     def onCloseRoot(self):
         self.root.destroy()
 
-#HomeApp()
-MainApp("USER000001", "aditeyabaral")
+class RepositoryApp:
+    def __init__(self, dir_path):
+        self.repo_name = cache["current_repository_name"]
+        self.root = Tk()
+        self.root.geometry("800x600")
+
+        win_title = f"Repository: {self.repo_name}"
+        self.root.title(win_title)
+        self.root.configure(background="#d2d2c9")
+
+        self.dir_path = dir_path
+        self.repo_id = cache["current_repository_id"]
+        self.username = cache["current_username"]
+        self.user_id = cache["current_user_id"]
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.root, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.left_frame = Frame(self.root, bg="#d2d2c9")
+        self.left_frame.pack(fill=Y, side=LEFT)
+
+        self.right_frame = Frame(self.root, bg="#d2d2c9")
+        self.right_frame.pack(padx=20, fill=Y, side=LEFT)
+
+        self.add_button = Button(
+            self.left_frame,
+            text="ADD",
+            command=self.add,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.add_button.config(height=2, width=30, borderwidth=0)
+        self.add_button.pack()
+
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.commit_button = Button(
+            self.left_frame,
+            text="COMMIT",
+            command=self.commitChanges,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.commit_button.config(height=2, width=30, borderwidth=0)
+        self.commit_button.pack()
+
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.push_button = Button(
+            self.left_frame,
+            text="PUSH",
+            command=self.pushChanges,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.push_button.config(height=2, width=30, borderwidth=0)
+        self.push_button.pack()
+
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.pull_button = Button(
+            self.left_frame,
+            text="PULL",
+            command=self.pullChanges,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.pull_button.config(height=2, width=30, borderwidth=0)
+        self.pull_button.pack()
+
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack(fill=Y)
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.add_collab_button = Button(
+            self.left_frame,
+            text="ADD COLLABORATOR",
+            command=self.addCollaborator,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.add_collab_button.config(height=2, width=30, borderwidth=0)
+        self.add_collab_button.pack()
+
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack(fill=Y)
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.verboseLabel = Label(self.right_frame, text=f"{self.repo_name}", background="#d2d2c9")
+        self.verboseLabel.config(fg="#6d031c", font=("Comfortaa", 13))
+        self.verboseLabel.pack()
+
+        self.blank = Label(self.right_frame, bg="#d2d2c9")
+        self.blank.pack(fill=Y)
+
+        self.root.protocol("WM_DELETE_WINDOW", self.onCloseRoot)
+        self.root.mainloop()
+    
+    def add(self):
+        if self.dir_path != os.getcwd():
+            os.chdir(self.dir_path)
+        filepaths = self.dir_path
+        user_id = cache["current_user_id"]
+        username = cache["current_username"]
+        repo_id = cache["current_repository_id"]
+        repo_name = cache["current_repository_name"]
+        print("Adding", cache)
+        add_status = repoUtils.add(cache, ".")
+        if not add_status[0]:
+            messagebox.showerror("Error", "You do not have add access to this repository")
+        else:
+            textvar = "\n".join(add_status[1])
+            self.verboseLabel.config(text=textvar)
+            self.onCloseWindow()
+
+    def commit(self):
+        user_id = cache["current_user_id"]
+        username = cache["current_username"]
+        repo_id = cache["current_repository_id"]
+        repo_name = cache["current_repository_name"]
+        commit_msg = self.commit_msg_entry.get()
+        commit_status = repoUtils.commit(cache, commit_msg)
+        if not commit_status[0]:
+            messagebox.showerror("Error", "You do not have commit access to this repository")
+        else:
+            textvar = commit_status[1]
+            self.verboseLabel.config(text=textvar)
+            self.onCloseWindow()
+    
+    def push(self):
+        user_id = cache["current_user_id"]
+        username = cache["current_username"]
+        repo_id = cache["current_repository_id"]
+        repo_name = cache["current_repository_name"]
+        print("PUSH", cache)
+        push_status = repoUtils.push(cache)
+        if not push_status[0]:
+            messagebox.showerror("Error", "You do not have push access to this repository")
+        else:
+            textvar = "\n".join(push_status[1])
+            self.verboseLabel.config(text=textvar)
+            self.onCloseWindow()
+
+    def commitChanges(self):
+        repo_name = cache["current_repository_name"]
+        self.window = Tk()
+        self.window.title(f"Commit Changes: {repo_name}")
+        self.window.configure(background="#d2d2c9")
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Please enter commit message", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.commit_msg_entry = Entry(self.window)
+        self.commit_msg_entry.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.commit_button2 = Button(
+            self.window,
+            text="COMMIT",
+            command=self.commit,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.commit_button2.config(height=2, width=30, borderwidth=0)
+        self.commit_button2.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
+        self.window.mainloop()
+        
+
+    def pushChanges(self):
+        repo_name = cache["current_repository_name"]
+        self.window = Tk()
+        self.window.title(f"Push Changes: {repo_name}")
+        self.window.configure(background="#d2d2c9")
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.push_changes_button2 = Button(
+            self.window,
+            text="PUSH CHANGES",
+            command=self.push,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.push_changes_button2.config(height=2, width=30, borderwidth=0)
+        self.push_changes_button2.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
+        self.window.mainloop()
+    
+    def pullChanges(self):
+        repo_name = cache["current_repository_name"]
+        self.window = Tk()
+        self.window.title(f"Pull Changes: {repo_name}")
+        self.window.configure(background="#d2d2c9")
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        textmsg = f"Repository: {repo_name}"
+        self.welcome = Label(self.window, text=textmsg, background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 25))
+        self.welcome.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.pull_changes_button2 = Button(
+            self.window,
+            text="PULL CHANGES",
+            command=self.pull,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.pull_changes_button2.config(height=2, width=30, borderwidth=0)
+        self.pull_changes_button2.pack(side=TOP, expand=1)
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
+        self.window.mainloop()
+    
+    def pull(self):
+        print("PULL", cache)
+        pull_status = repoUtils.pull(cache)
+        if not pull_status[0]:
+            if pull_status[1] == 1:
+                messagebox.showerror("Error", "You do not have pull access on this repository.")
+            elif pull_status[1] == 2:
+                messagebox.showwarning("Warning", "No commits have been pushed to repository.")
+            elif pull_status[1] == 3:
+                messagebox.showerror("Error", "No commits have been created.")
+            elif pull_status[1] == 4:
+                messagebox.showerror("Error", "No changes to pull, repository is upto date.")
+        else:
+            messagebox.showinfo("Info", "Pulled Successfully")
+    def addCollaborator(self):
+        self.window = Tk()
+        self.window = Tk()
+        self.window.title(f"Add Collaborator: {repo_name}")
+        self.window.configure(background="#d2d2c9")
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.window, text="Add collaborator", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()  
+
+        self.welcome = Label(self.window, text="Please enter collaborator username", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 20))
+        self.welcome.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.add_collab_entry = Entry(self.window)
+        self.add_collab_entry.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.add_collab_button2 = Button(
+            self.window,
+            text="ADD AS COLLABORATOR",
+            command=self.addcollab,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.add_collab_button2.config(height=2, width=30, borderwidth=0)
+        self.add_collab_button2.pack()
+
+        self.blank = Label(self.window, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
+        self.window.mainloop()
+
+    def addcollab(self):
+        collab_username = self.add_collab_entry.get()
+        if collab_username=='' or collab_username is None:
+            messagebox.showerror("Error", "Collaborator name cannot be empty")
+            self.onCloseWindow()
+        else:
+            repoUtils.addCollaborator(cache, collab_username)
+            messagebox.showinfo("Info", "Added collaborator!")
+            self.onCloseWindow()
+
+    def onCloseWindow(self):
+        self.window.destroy()
+
+    def onCloseRoot(self):
+        self.root.destroy()
+
+
+HomeApp()
+#MainApp("USER000001", "aditeyabaral")
+#RepositoryApp("/aditeyabaral/testrepo")

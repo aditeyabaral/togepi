@@ -34,6 +34,7 @@ def uploadFile(local_path, dropbox_path):
 
 
 def ls_dropbox(dropbox_path=""):
+    print("LS dropbox:", dropbox_path)
     files = list()
     for entry in dbx.files_list_folder(dropbox_path).entries:
         #print(entry.name)
@@ -55,14 +56,17 @@ def uploadFolder(local_path, dropbox_path):
     ]
 
     files = [fname for fname in files if os.path.isfile(fname)]
-
+    output_str = []
     for file in files:
         rel_path = os.path.relpath(file, local_path)
         dropbox_file_path = os.path.join(dropbox_path, rel_path)
         with open(file, "rb") as f:
             print(f'Uploading {rel_path}')
+            if not rel_path.startswith(".togepi"):
+                output_str.append(f'Uploaded {rel_path}')
             dbx.files_upload(f.read(), dropbox_file_path,
                              mode=dropbox.files.WriteMode.overwrite)
+    return output_str
 
 
 def getRecentCloudCommitTime(dropbox_path):

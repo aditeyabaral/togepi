@@ -1,21 +1,22 @@
 import re
-import dbUtils
+from dbUtils import *
 
+userDB = userDBUtils()
 
 def validateUsername(username):
     usernameRegex = re.compile(r"^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
     validUsername = bool(re.findall(usernameRegex, username))
     if not validUsername:
         print("Invalid username! Username cannot contain special characters at the beginning or end, or consecutively!")
-        return False
-    allUsernames = dbUtils.getAllUsername()
+        return False, 1
+    allUsernames = userDB.getAllUsername()
     if allUsernames == []: # Handles no entries in DB
-        return True
+        return True, 0
     if username in allUsernames[0]:
         print("Sorry, that username already exists! Please try another one")
-        return False
+        return False, 2
     else:
-        return True
+        return True, 0
 
 
 def validatePassword(password):

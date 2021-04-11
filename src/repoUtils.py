@@ -4,9 +4,16 @@ from glob import glob
 from datetime import date, datetime
 
 from sqlalchemy.sql.expression import desc
-import dbUtils
+from dbUtils import *
 import cliUtils
 import fsUtils
+
+repoDB = repoDBUtils()
+fileDB = fileDBUtils()
+commitDB = commitDBUtils()
+relationDB = relationDBUtils()
+userDB = userDBUtils()
+
 
 
 def getRepoIdFromDirectory():
@@ -44,7 +51,7 @@ def checkFileIsModified(diff):
 
 
 def generateRepositoryID():
-    all_repos = dbUtils.getAllRepositoryID()
+    all_repos = repoDB.getAllRepositoryID()
     if not all_repos:
         repo_id = "REPO000001"
     else:
@@ -55,7 +62,7 @@ def generateRepositoryID():
 
 
 def generateFileID():
-    all_files = dbUtils.getAllFileID()
+    all_files = fileDB.getAllFileID()
     if not all_files:
         file_id = "FILE000001"
     else:
@@ -66,7 +73,7 @@ def generateFileID():
 
 
 def generateCommitID():
-    all_commits = dbUtils.getAllCommitID()
+    all_commits = commitDB.getAllCommitID()
     if not all_commits:
         commit_id = "COMMIT000001"
     else:
@@ -90,20 +97,20 @@ collaborators,'''
         f.write(content)
 
 def getRepoOwner(repo_id):
-    relations = dbUtils.getAllRelations(repo_id)
+    relations = relationDB.getAllRelations(repo_id)
     owner = ''
     for relation in relations:
         if relation[-1] == "owner":
             owner_id = relation[0]
             break
-    owner_name = dbUtils.getUsername(owner_id)
+    owner_name = userDB.getUsername(owner_id)
     return owner, owner_name
 
 
 def init(cache, repo_name):
     user_id = cache["current_user_id"]
     username = cache["current_username"]
-    if dbUtils.checkUserRepositoryExists(user_id, repo_name):
+    if repoDB.checkUserRepositoryExists(user_id, repo_name):
         print("Repository names have to be unique per user.")
         return False
     if len(repo_name) > 50:
@@ -130,9 +137,9 @@ def init(cache, repo_name):
 
     createInfoFile(user_id, repo_name, repo_id, description,
                    url, create_time, visibility)
-    dbUtils.createRepository(user_id, repo_name, repo_id,
+    repoDB.createRepository(user_id, repo_name, repo_id,
                              description, url, create_time, visibility)
-    dbUtils.createUserRepositoryRelation(user_id, repo_id)
+    relationDB.createUserRepositoryRelation(user_id, repo_id)
 
     dropbox_path = f"/{username}/{repo_name}/"
     # before uploading track the info file
@@ -144,13 +151,14 @@ def init(cache, repo_name):
 def initGUI(cache, repo_name, description=None, visibility="public"):
     user_id = cache["current_user_id"]
     username = cache["current_username"]
-    if dbUtils.checkUserRepositoryExists(user_id, repo_name):
+    if repoDB.checkUserRepositoryExists(user_id, repo_name):
         print("Repository names have to be unique per user.")
         return False, 1
     if len(repo_name) > 50:
         print("Repository Name cannot be over 50 chars long")
         return False, 2
     cliUtils.mkdir(repo_name)
+    return_path = os.path.join(os.getcwd(), repo_name)
     cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
     repo_id = generateRepositoryID()
     #     description = input("Enter repository description (under 150 chars): ")
@@ -165,15 +173,15 @@ def initGUI(cache, repo_name, description=None, visibility="public"):
 
     createInfoFile(user_id, repo_name, repo_id, description,
                    url, create_time, visibility)
-    dbUtils.createRepository(user_id, repo_name, repo_id,
+    repoDB.createRepository(user_id, repo_name, repo_id,
                              description, url, create_time, visibility)
-    dbUtils.createUserRepositoryRelation(user_id, repo_id)
+    relationDB.createUserRepositoryRelation(user_id, repo_id)
 
     dropbox_path = f"/{username}/{repo_name}/"
     # before uploading track the info file
     local_path = os.path.join(os.getcwd(), repo_name)
     fsUtils.uploadFolder(local_path, dropbox_path)
-    return True, 0
+    return True, (repo_id, repo_name, user_id, username), return_path
 
 
 def add(cache, filepaths):
@@ -182,7 +190,7 @@ def add(cache, filepaths):
     # check if files were deleted -- untrack these files by deleting from db (and dropbox folder)
     user_id = cache["current_user_id"]
     repo_id = cache["current_repository_id"]
-    relations = dbUtils.getAllRelations(repo_id)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id:
@@ -191,11 +199,11 @@ def add(cache, filepaths):
             break
     if not found_user:
         print("You do not have access to this repository. Cannot add files")
-        return 
+        return False, []
     if filepaths == ".":
         filepaths = [os.path.join(parent, name) for (
             parent, subdirs, files) in os.walk(".") for name in files + subdirs]
-
+    print(filepaths)
     # filepaths = [fname for fname in filepaths if os.path.isfile(fname)]
 
     ignored_files = list()
@@ -217,15 +225,16 @@ def add(cache, filepaths):
 
     new_tracked_files = list()
     for f in filepaths:
-        if not dbUtils.checkFileInDatabase(repo_id, f):
+        if not fileDB.checkFileInDatabase(repo_id, f):
             new_tracked_files.append(f)
-
+    outputs = []
     current_time = datetime.utcnow()
     for tracked_file in new_tracked_files:
         file_id = generateFileID()
-        dbUtils.createFile(file_id, tracked_file, repo_id,
+        fileDB.createFile(file_id, tracked_file, repo_id,
                            "unchanged", current_time, None, None)
-
+        outputs.append(f"File {tracked_file} successfully tracked.")
+    return True, outputs
 
 def commit(cache, message=None):
     user_id = cache["current_user_id"]
@@ -234,7 +243,7 @@ def commit(cache, message=None):
     repo_name = cache["current_repository_name"]
 
     owner_id, owner_name = getRepoOwner(repo_id)
-    relations = dbUtils.getAllRelations(repo_id)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id:
@@ -243,8 +252,8 @@ def commit(cache, message=None):
             break
     if not found_user:
         print("You do not have commit access to this repository.")
-        return 
-    tracked_files = dbUtils.getTrackedFiles(repo_id)
+        return False, ""
+    tracked_files = fileDB.getTrackedFiles(repo_id)
     modified_files = dict()
 
     num_files_changed = 0
@@ -261,7 +270,7 @@ def commit(cache, message=None):
             modified_files[fname] = diff
             last_modified_time = datetime.utcfromtimestamp(
                 os.path.getmtime(fname))
-            dbUtils.updateFileModifiedTime(repo_id, fname, last_modified_time)
+            fileDB.updateFileModifiedTime(repo_id, fname, last_modified_time)
 
             num_files_changed += 1
             num_diffs["add"] += adds
@@ -271,21 +280,24 @@ def commit(cache, message=None):
     current_time = datetime.utcnow()
     current_time_string = "-".join(str(datetime.utcnow())[:19].split())
     folder_name = f".togepi/{commit_id}--{current_time_string}"
+    output_str = ''
     for modified_file in modified_files:
-        file_id = dbUtils.getFileID(repo_id, modified_file)
+        file_id = fileDB.getFileID(repo_id, modified_file)
         if not os.path.exists(folder_name):
             cliUtils.mkdir(folder_name)
         with open(f"{folder_name}/{file_id}.txt", "w") as f:
             f.write(f"{modified_file}\n\n")
             f.write(modified_files[modified_file])
-        dbUtils.createCommit(commit_id, user_id, repo_id,
+        commitDB.createCommit(commit_id, user_id, repo_id,
                              current_time, file_id, message)
-        dbUtils.updateFileCommitTime(repo_id, modified_file, current_time)
+        fileDB.updateFileCommitTime(repo_id, modified_file, current_time)
         print(f"added changes: {modified_file}")
-
+        output_str += f"added changes: {modified_file}\n"
     adds = num_diffs["add"]
     dels = num_diffs["del"]
     print(f"{num_files_changed} files changed: {adds} addtions(+) {dels} deletions(-)")
+    output_str += f"{num_files_changed} files changed: {adds} addtions(+) {dels} deletions(-)\n"
+    return True, output_str
 
 
 def push(cache):
@@ -293,7 +305,7 @@ def push(cache):
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
     user_id = cache["current_user_id"]
-    relations = dbUtils.getAllRelations(repo_id)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id:
@@ -302,16 +314,17 @@ def push(cache):
             break
     if not found_user:
         print("You do not have push access to this repository.")
-        return
+        return False, []
     owner_id, owner_name = getRepoOwner(repo_id)
     current_time = datetime.utcnow()
-    tracked_files = dbUtils.getTrackedFiles(repo_id)
+    tracked_files = fileDB.getTrackedFiles(repo_id)
     for fname in tracked_files:
-        dbUtils.updateFilePushTime(repo_id, fname, current_time)
+        fileDB.updateFilePushTime(repo_id, fname, current_time)
 
     local_path = f"../{repo_name}"
     dropbox_path = f"/{owner_name}/{repo_name}/"
-    fsUtils.uploadFolder(local_path, dropbox_path)
+    output = fsUtils.uploadFolder(local_path, dropbox_path)
+    return True, output
 
 
 def pull(cache):
@@ -319,7 +332,8 @@ def pull(cache):
     username = cache["current_username"]
     repo_name = cache["current_repository_name"]
     user_id = cache["current_user_id"]
-    relations = dbUtils.getAllRelations(repo_id)
+    print("inside pull, cache:", cache)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id:
@@ -328,21 +342,27 @@ def pull(cache):
             break
     if not found_user:
         print("You do not have pull access on this repository.")
-        return
+        return False, 1
+    owner_id, owner_name = getRepoOwner(repo_id)
+    print(f"cloud path: /{owner_name}/{repo_name}/.togepi")
     most_recent_cloud_commit_time = fsUtils.getRecentCloudCommitTime(
-        f"/{username}/{repo_name}/.togepi")
+        f"/{owner_name}/{repo_name}/.togepi")
     most_recent_local_commit_time = fsUtils.getRecentLocalCommitTime()
 
     if most_recent_cloud_commit_time is None:   # check other way round
         print("No commits have been pushed to repository.")
+        return False, 2
     elif most_recent_local_commit_time is None:  # check other way round
         print("No commits have been created.")
+        return False, 3
     else:
         if most_recent_cloud_commit_time == most_recent_local_commit_time:
             print("No changes to pull, repository is upto date.")
+            return False, 4
         else:
             print("Pulling changes...")
             fsUtils.downloadFolder(username, repo_name)
+            return True, 0
 
 
 def status(cache):
@@ -351,8 +371,8 @@ def status(cache):
     repo_name = cache["current_repository_name"]
     user_id = cache["current_user_id"]
     owner_id, owner_name = getRepoOwner(repo_id)
-    tracked_files = dbUtils.getTrackedFiles(repo_id)
-    relations = dbUtils.getAllRelations(repo_id)
+    tracked_files = fileDB.getTrackedFiles(repo_id)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id:
@@ -371,7 +391,7 @@ def status(cache):
         if checkFileIsModified(diff):
             last_modified_time = datetime.utcfromtimestamp(
                 os.path.getmtime(fname))
-            dbUtils.updateFileModifiedTime(repo_id, fname, last_modified_time)
+            fileDB.updateFileModifiedTime(repo_id, fname, last_modified_time)
             print(f"modified: {fname}")
 
     # display if commits are yet to be pushed
@@ -381,11 +401,11 @@ def status(cache):
 
 def clone(cache, clone_path):
     repo_username, repo_name = clone_path.split("/")
-    repo_id, repo_status = dbUtils.getRepoStatus(repo_username, repo_name)
+    repo_id, repo_status = repoDB.getRepoStatus(repo_username, repo_name)
     if repo_status != "public":
         user_id = cache["current_user_id"]
         #print("Trying to clone", repo_id, user_id)
-        relations = dbUtils.getAllRelations(repo_id)
+        relations = relationDB.getAllRelations(repo_id)
         found_user = False
         for relation in relations:
             if relation[0]==user_id:
@@ -407,7 +427,8 @@ def clone(cache, clone_path):
 def addCollaborator(cache, collab_username):
     repo_id = cache["current_repository_id"]
     user_id = cache["current_user_id"]
-    relations = dbUtils.getAllRelations(repo_id)
+    print("add collab:", cache)
+    relations = relationDB.getAllRelations(repo_id)
     found_user = False
     for relation in relations:
         if relation[0]==user_id and relation[-1]=="owner":
@@ -417,11 +438,11 @@ def addCollaborator(cache, collab_username):
     if not found_user:
         print("You are not owner of this repository. Cannot add collaborator")
         return
-    collab_user_id = dbUtils.getUserID(collab_username)
+    collab_user_id = userDB.getUserID(collab_username)
     if collab_user_id == '':
         print(
             f"User {collab_username} does not exist. Please check the username")
         return
-    dbUtils.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
+    relationDB.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
 
 
