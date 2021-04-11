@@ -116,6 +116,9 @@ class HomeApp:
         print(unamevalidate, pwdvalidate, emailvalidate)
         if not (unamevalidate[0] or pwdvalidate or emailvalidate):
             if not unamevalidate[0]:
+                if unamevalidate[1] == 0:
+                    messagebox.showerror(
+                        "Error", "Invalid username! Cannot be greater than 50 chars long")
                 if unamevalidate[1] == 1:
                     messagebox.showerror(
                         "Error", "Invalid username! No special chars at start or end")

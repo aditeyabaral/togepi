@@ -4,6 +4,8 @@ from dbUtils import *
 userDB = userDBUtils()
 
 def validateUsername(username):
+    if len(username) > 50:
+        return False, 0
     usernameRegex = re.compile(r"^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$")
     validUsername = bool(re.findall(usernameRegex, username))
     if not validUsername:
