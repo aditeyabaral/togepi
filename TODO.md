@@ -25,12 +25,7 @@
 
 9. Track .togepi/tgpinfo.txt by default -- DEBATABLE
 
-10. Deletion of files
 
-
-11. GUI
+10. GUI
     * formatting of content
-    * StringVar() for validation
-    * login page - add go back and sign up
-    * sign up page
-    * use only cache
+    * login page - add go back and sign up (?)
