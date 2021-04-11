@@ -1,8 +1,0 @@
-repository_id,REPO000007
-repository_name,myfirstrepo
-user_id,USER000002
-url,/aditeyabaral/myfirstrepo
-description,this is myfirstrepo
-create_time,2021-04-11 16:31:43.903474,
-visibility,public
-collaborators,
