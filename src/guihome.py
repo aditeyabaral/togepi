@@ -102,6 +102,10 @@ class HomeApp:
     def onCloseRoot(self):
         self.root.destroy()
 
+    def loadHome(self):
+        self.onCloseRoot()
+        HomeApp()
+
     def verifyLoginCredentials(self):
         global cache
         self.username = self.username_entry.get()
@@ -114,7 +118,7 @@ class HomeApp:
         else:
             cache["current_user_id"] = self.user_id
             cache["current_username"] = self.username
-            self.onCloseWindow()
+            # self.onCloseWindow()
             self.onCloseRoot()
             MainApp(self.user_id, self.username)
 
@@ -148,11 +152,101 @@ class HomeApp:
             print(cache)
             userUtils.createUserGUI(
                 UserId, self.username, self.password, self.email)
-            self.onCloseWindow()
+            # self.onCloseWindow()
             self.onCloseRoot()
             MainApp(self.user_id, self.username)
 
     def logIn(self):
+        self.onCloseRoot()
+        self.root = Tk()
+        self.root.title("Togepi")
+        self.root.configure(background="#d2d2c9")
+        # self.root.geometry("480x640")
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.root, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(
+            self.root, text="Please enter your credentials", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.root, text="Username",
+                             background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.username = StringVar()
+        self.username_entry = Entry(self.root, textvariable=self.username)
+        self.username_entry.pack()
+
+        self.welcome = Label(self.root, text="Password",
+                             background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.password = StringVar()
+        self.password_entry = Entry(
+            self.root, textvariable=self.password, show="*")
+        self.password_entry.pack()
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        # self.validation_str = StringVar()
+        # self.validation_str.set("hello")
+        # self.validation_login = Message(
+        #     self.root, textvariable=self.validation_str, background="#d2d2c9")
+        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
+        # self.validation_login.pack()
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.login_button = Button(
+            self.root,
+            text="LOGIN",
+            command=self.verifyLoginCredentials,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.login_button.config(height=2, width=30, borderwidth=0)
+        self.login_button.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.exit_button_choice = Button(
+            self.root,
+            text="BACK",
+            command=self.loadHome,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.root.protocol("WM_DELETE_root", self.onCloseRoot)
+        self.root.mainloop()
+
+    '''def logIn(self):
+        self.onCloseRoot()
         self.window = Tk()
         self.window.title("Togepi")
         self.window.configure(background="#d2d2c9")
@@ -227,7 +321,7 @@ class HomeApp:
         self.exit_button_choice = Button(
             self.window,
             text="BACK",
-            command=self.onCloseWindow,
+            command=HomeApp,
             bg="#4759b8",
             fg="white",
             font=("Comfortaa", 15),
@@ -238,9 +332,9 @@ class HomeApp:
         self.blank.pack()
 
         self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
-        self.window.mainloop()
+        self.window.mainloop()'''
 
-    def signUp(self):
+    '''def signUp(self):
         self.window = Tk()
         self.window.title("Togepi")
         self.window.configure(background="#d2d2c9")
@@ -331,7 +425,101 @@ class HomeApp:
         self.blank.pack()
 
         self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
-        self.window.mainloop()
+        self.window.mainloop()'''
+
+    def signUp(self):
+        self.onCloseRoot()
+        self.root = Tk()
+        self.root.title("Togepi")
+        self.root.configure(background="#d2d2c9")
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.welcome = Label(self.root, text="Togepi", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(
+            self.root, text="Please enter your credentials", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.welcome = Label(self.root, text="Username",
+                             background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.username = StringVar()
+        self.username_entry = Entry(self.root, textvariable=self.username)
+        self.username_entry.pack()
+
+        self.welcome = Label(self.root, text="Password",
+                             background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.password = StringVar()
+        self.password_entry = Entry(self.root, textvariable=self.password, show='*')
+        self.password_entry.pack()
+
+        self.welcome = Label(self.root, text="E-Mail", background="#d2d2c9")
+        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
+        self.welcome.pack()
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.email = StringVar()
+        self.email_entry = Entry(self.root, textvariable=self.email)
+        self.email_entry.pack()
+
+        # self.validation_str = StringVar()
+        # self.validation_str.set("hello")
+        # self.validation_login = Message(
+        #     self.root, textvariable=self.validation_str, background="#d2d2c9")
+        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
+        # self.validation_login.pack()
+
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.signup_button = Button(
+            self.root,
+            text="SIGN UP",
+            command=self.verifySignupCredentials,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.signup_button.config(height=2, width=30, borderwidth=0)
+        self.signup_button.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.exit_button_choice = Button(
+            self.root,
+            text="BACK",
+            command=self.loadHome,
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
+        self.blank = Label(self.root, bg="#d2d2c9")
+        self.blank.pack()
+
+        self.root.protocol("WM_DELETE_root", self.onCloseRoot)
+        self.root.mainloop()
 
 
 class MainApp():
@@ -431,6 +619,7 @@ class MainApp():
         self.dir_path = getDirectoryDialog()
         print("self.dir_path", self.dir_path)
         cliUtils.cd(self.dir_path)
+        self.onCloseRoot()
         RepositoryApp(self.dir_path)
 
     def cloneRepository(self):
@@ -510,15 +699,15 @@ class MainApp():
             messagebox.showerror(
                 "Error", "You are not a collaborator on this repository, cannot clone")
         else:
-            self.dir_path = os.getcwd()
-            self.dir_path = os.path.join(self.dir_path, repo_name)
-            info = open(f"{self.dir_path}/.togepi/tgpinfo.txt",
-                        'r').read().split('\n')
-            cache["current_repository_id"] = info[0].split(",")[1]
-            cache["current_repository_name"] = info[1].split(",")[1]
+            # self.dir_path = os.getcwd()
+            # self.dir_path = os.path.join(self.dir_path, repo_name)
+            # info = open(f"{self.dir_path}/.togepi/tgpinfo.txt",
+            #             'r').read().split('\n')
+            # cache["current_repository_id"] = info[0].split(",")[1]
+            # cache["current_repository_name"] = info[1].split(",")[1]
             self.onCloseWindow()
-            self.onCloseRoot()
-            RepositoryApp(self.dir_path)
+            # self.onCloseRoot()
+            # RepositoryApp(self.dir_path)
 
     def createRepository(self):
         self.window = Tk()
@@ -628,6 +817,11 @@ class MainApp():
                 self.onCloseWindow()
 
     def logOut(self):
+        global cache
+        cache["current_user_id"] = None
+        cache["current_username"] = None
+        cache["current_repository_id"] = None
+        cache["current_repository_name"] = None
         self.onCloseRoot()
         HomeApp()
 
@@ -749,6 +943,19 @@ class RepositoryApp:
         self.blank = Label(self.left_frame, bg="#d2d2c9")
         self.blank.pack()
 
+        self.exit_button_choice = Button(
+            self.left_frame,
+            text="BACK",
+            command=self.loadMain,#handle this
+            bg="#4759b8",
+            fg="white",
+            font=("Comfortaa", 15),
+        )
+        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
+        self.exit_button_choice.pack(side=TOP, expand=1)
+        self.blank = Label(self.left_frame, bg="#d2d2c9")
+        self.blank.pack()
+
         self.verboseLabel = Label(
             self.right_frame, text=f"{self.repo_name}", background="#d2d2c9")
         self.verboseLabel.config(fg="#6d031c", font=("Comfortaa", 13))
@@ -759,6 +966,15 @@ class RepositoryApp:
 
         self.root.protocol("WM_DELETE_WINDOW", self.onCloseRoot)
         self.root.mainloop()
+
+
+    def loadMain(self):
+        global cache
+        self.onCloseRoot()
+        cache["current_repository_id"] = None
+        cache["current_repository_name"] = None
+        MainApp(cache["current_user_id"], cache["current_username"])
+
 
     def add(self):
         if self.dir_path != os.getcwd():

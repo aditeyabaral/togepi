@@ -28,5 +28,4 @@
 
 10. GUI
     * formatting of content
-    * close main choice window once repo is chosen
-    * sign up page window title
+    * give option to create repo, clone repo
