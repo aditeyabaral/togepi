@@ -417,11 +417,11 @@ def clone(cache, clone_path):
             return False
         else:
             print(f"Cloning repository {repo_name}...")
-            fsUtils.downloadFolder(repo_username, repo_name)
+            fsUtils.downloadFolder(repo_username, repo_name, pull=False)
             return True
     else:
         print(f"Cloning repository {repo_name}...")
-        fsUtils.downloadFolder(repo_username, repo_name)
+        fsUtils.downloadFolder(repo_username, repo_name, pull=False)
         return True
 
 def addCollaborator(cache, collab_username):

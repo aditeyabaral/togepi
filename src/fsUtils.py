@@ -91,8 +91,9 @@ def getRecentLocalCommitTime():
     return None
 
 
-def downloadFolder(username, repo_name):
-    cliUtils.cd("..")
+def downloadFolder(username, repo_name, pull=True):
+    if pull:
+        cliUtils.cd("..")
     local_path = os.getcwd()
     dropbox_path = f"/{username}/{repo_name}"
     try:
@@ -100,6 +101,7 @@ def downloadFolder(username, repo_name):
         dbx.files_download_zip_to_file(local_zip_path, dropbox_path)
         os.system(f"unzip -o {repo_name}.zip")
         os.remove(f"{repo_name}.zip")
-        cliUtils.cd(f"{repo_name}")
+        if pull:
+            cliUtils.cd(f"{repo_name}")
     except:
         print("Could not pull. Error occured.")
