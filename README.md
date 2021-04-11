@@ -46,10 +46,37 @@ To run Togepi on command-line, run `python3 src/main.py`
 
 You can create users using `togepi user create`.
 
+## Graphical User Interface
 
+To run Togepi using a GUI, run `python3 src/gui.py`. The interface itself is easy and intuitive to use and should not take too much time understanding your way around it.
 
+<p align="center">
+  <img src="img/gui/gui-home.png">
+</p>
+
+### After Registering or Logging In
+
+<p align="center">
+  <img src="img/gui/gui-main.png">
+</p>
+
+### Creating a Repository
+
+<p align="center">
+  <img src="img/gui/gui-createrepo.png">
+</p>
+
+### After Choosing a Repository
+
+<p align="center">
+  <img src="img/gui/gui-repo.png">
+</p>
+
+Additional screenshots have been added to `img/gui/gui` for reference.
 
 # Contributing to Togepi
+
+Contributions to Togepi are welcome, in the form of bug fixes as well as feature enhancements. We look forward to adding more features to the CLI, such as `forks` and `braches`.
 
 # Acknowledgements
 
