@@ -7,3 +7,4 @@ test/
 testrepo*/
 .idea
 *.zip
+.env

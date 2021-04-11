@@ -8,3 +8,4 @@ togepi/
 testrepo*/
 .idea
 *.zip
+.env
