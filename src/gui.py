@@ -20,9 +20,12 @@ def getDirectoryDialog():
     global cache
     dir_path = filedialog.askdirectory()
     print(dir_path)
-    info = open(f"{dir_path}/.togepi/tgpinfo.txt", 'r').read().split('\n')
-    cache["current_repository_id"] = info[0].split(",")[1]
-    cache["current_repository_name"] = info[1].split(",")[1]
+    try:
+        info = open(f"{dir_path}/.togepi/tgpinfo.txt", 'r').read().split('\n')
+        cache["current_repository_id"] = info[0].split(",")[1]
+        cache["current_repository_name"] = info[1].split(",")[1]
+    except:
+        pass
     return dir_path
 
 
@@ -119,7 +122,6 @@ class HomeApp:
         else:
             cache["current_user_id"] = self.user_id
             cache["current_username"] = self.username
-            # self.onCloseWindow()
             self.onCloseRoot()
             MainApp(self.user_id, self.username)
 
@@ -153,7 +155,6 @@ class HomeApp:
             print(cache)
             userUtils.createUserGUI(
                 UserId, self.username, self.password, self.email)
-            # self.onCloseWindow()
             self.onCloseRoot()
             MainApp(self.user_id, self.username)
 
@@ -162,7 +163,6 @@ class HomeApp:
         self.root = Tk()
         self.root.title("Togepi")
         self.root.configure(background="#d2d2c9")
-        # self.root.geometry("480x640")
 
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
@@ -207,13 +207,6 @@ class HomeApp:
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
 
-        # self.validation_str = StringVar()
-        # self.validation_str.set("hello")
-        # self.validation_login = Message(
-        #     self.root, textvariable=self.validation_str, background="#d2d2c9")
-        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        # self.validation_login.pack()
-
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
 
@@ -245,188 +238,6 @@ class HomeApp:
 
         self.root.protocol("WM_DELETE_root", self.onCloseRoot)
         self.root.mainloop()
-
-    '''def logIn(self):
-        self.onCloseRoot()
-        self.window = Tk()
-        self.window.title("Togepi")
-        self.window.configure(background="#d2d2c9")
-        # self.window.geometry("480x640")
-
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.welcome = Label(
-            self.window, text="Please enter your credentials", background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.welcome = Label(self.window, text="Username",
-                             background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.username = StringVar()
-        self.username_entry = Entry(self.window, textvariable=self.username)
-        self.username_entry.pack()
-
-        self.welcome = Label(self.window, text="Password",
-                             background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.password = StringVar()
-        self.password_entry = Entry(
-            self.window, textvariable=self.password, show="*")
-        self.password_entry.pack()
-
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        # self.validation_str = StringVar()
-        # self.validation_str.set("hello")
-        # self.validation_login = Message(
-        #     self.window, textvariable=self.validation_str, background="#d2d2c9")
-        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        # self.validation_login.pack()
-
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.login_button = Button(
-            self.window,
-            text="LOGIN",
-            command=self.verifyLoginCredentials,
-            bg="#4759b8",
-            fg="white",
-            font=("Comfortaa", 15),
-        )
-        self.login_button.config(height=2, width=30, borderwidth=0)
-        self.login_button.pack(side=TOP, expand=1)
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.exit_button_choice = Button(
-            self.window,
-            text="BACK",
-            command=HomeApp,
-            bg="#4759b8",
-            fg="white",
-            font=("Comfortaa", 15),
-        )
-        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
-        self.exit_button_choice.pack(side=TOP, expand=1)
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
-        self.window.mainloop()'''
-
-    '''def signUp(self):
-        self.window = Tk()
-        self.window.title("Togepi")
-        self.window.configure(background="#d2d2c9")
-
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-        self.welcome = Label(self.window, text="Togepi", background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 80))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.welcome = Label(
-            self.window, text="Please enter your credentials", background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.welcome = Label(self.window, text="Username",
-                             background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.username = StringVar()
-        self.username_entry = Entry(self.window, textvariable=self.username)
-        self.username_entry.pack()
-
-        self.welcome = Label(self.window, text="Password",
-                             background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.password = StringVar()
-        self.password_entry = Entry(self.window, textvariable=self.password, show='*')
-        self.password_entry.pack()
-
-        self.welcome = Label(self.window, text="E-Mail", background="#d2d2c9")
-        self.welcome.config(fg="#6d031c", font=("Comfortaa", 30))
-        self.welcome.pack()
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.email = StringVar()
-        self.email_entry = Entry(self.window, textvariable=self.email)
-        self.email_entry.pack()
-
-        # self.validation_str = StringVar()
-        # self.validation_str.set("hello")
-        # self.validation_login = Message(
-        #     self.window, textvariable=self.validation_str, background="#d2d2c9")
-        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        # self.validation_login.pack()
-
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.signup_button = Button(
-            self.window,
-            text="SIGN UP",
-            command=self.verifySignupCredentials,
-            bg="#4759b8",
-            fg="white",
-            font=("Comfortaa", 15),
-        )
-        self.signup_button.config(height=2, width=30, borderwidth=0)
-        self.signup_button.pack(side=TOP, expand=1)
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.exit_button_choice = Button(
-            self.window,
-            text="BACK",
-            command=self.onCloseWindow,
-            bg="#4759b8",
-            fg="white",
-            font=("Comfortaa", 15),
-        )
-        self.exit_button_choice.config(height=2, width=30, borderwidth=0)
-        self.exit_button_choice.pack(side=TOP, expand=1)
-        self.blank = Label(self.window, bg="#d2d2c9")
-        self.blank.pack()
-
-        self.window.protocol("WM_DELETE_WINDOW", self.onCloseWindow)
-        self.window.mainloop()'''
 
     def signUp(self):
         self.onCloseRoot()
@@ -470,7 +281,8 @@ class HomeApp:
         self.blank.pack()
 
         self.password = StringVar()
-        self.password_entry = Entry(self.root, textvariable=self.password, show='*')
+        self.password_entry = Entry(
+            self.root, textvariable=self.password, show='*')
         self.password_entry.pack()
 
         self.welcome = Label(self.root, text="E-Mail", background="#d2d2c9")
@@ -482,13 +294,6 @@ class HomeApp:
         self.email = StringVar()
         self.email_entry = Entry(self.root, textvariable=self.email)
         self.email_entry.pack()
-
-        # self.validation_str = StringVar()
-        # self.validation_str.set("hello")
-        # self.validation_login = Message(
-        #     self.root, textvariable=self.validation_str, background="#d2d2c9")
-        # self.validation_login.config(fg="#6d031c", font=("Comfortaa", 30))
-        # self.validation_login.pack()
 
         self.blank = Label(self.root, bg="#d2d2c9")
         self.blank.pack()
@@ -528,7 +333,6 @@ class MainApp():
         self.root = Tk()
         self.root.title(f"Togepi: {username}")
         self.root.configure(background="#d2d2c9")
-        # self.root.geometry("480x640")
 
         self.username = username
         self.user_id = user_id
@@ -627,7 +431,6 @@ class MainApp():
         self.window = Tk()
         self.window.title("Togepi")
         self.window.configure(background="#d2d2c9")
-        # self.window.geometry("480x640")
 
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
@@ -671,9 +474,6 @@ class MainApp():
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
 
-        # create Message box, update with unable to clone or some status if status variable in clone is False,
-        # set to successfully cloned if status = True
-
         self.clone_button = Button(
             self.window,
             text="CLONE",
@@ -699,22 +499,12 @@ class MainApp():
         if not status:
             messagebox.showerror(
                 "Error", "You are not a collaborator on this repository, cannot clone")
-        else:
-            # self.dir_path = os.getcwd()
-            # self.dir_path = os.path.join(self.dir_path, repo_name)
-            # info = open(f"{self.dir_path}/.togepi/tgpinfo.txt",
-            #             'r').read().split('\n')
-            # cache["current_repository_id"] = info[0].split(",")[1]
-            # cache["current_repository_name"] = info[1].split(",")[1]
-            self.onCloseWindow()
-            # self.onCloseRoot()
-            # RepositoryApp(self.dir_path)
+        self.onCloseWindow()
 
     def createRepository(self):
         self.window = Tk()
         self.window.title("Togepi")
         self.window.configure(background="#d2d2c9")
-        # self.window.geometry("480x640")
 
         self.blank = Label(self.window, bg="#d2d2c9")
         self.blank.pack()
@@ -837,7 +627,7 @@ class RepositoryApp:
     def __init__(self, dir_path):
         self.repo_name = cache["current_repository_name"]
         self.root = Tk()
-        self.root.geometry("800x600")
+        # self.root.geometry("800x600")
 
         win_title = f"Repository: {self.repo_name}"
         self.root.title(win_title)
@@ -947,7 +737,7 @@ class RepositoryApp:
         self.exit_button_choice = Button(
             self.left_frame,
             text="BACK",
-            command=self.loadMain,  # handle this
+            command=self.loadMain,
             bg="#4759b8",
             fg="white",
             font=("Comfortaa", 15),
@@ -958,7 +748,7 @@ class RepositoryApp:
         self.blank.pack()
 
         self.verboseLabel = Label(
-            self.right_frame, text=f"{self.repo_name}", background="#d2d2c9")
+            self.right_frame, text=f"{self.repo_name}", background="#d2d2c9", width=75)
         self.verboseLabel.config(fg="#6d031c", font=("Comfortaa", 13))
         self.verboseLabel.pack()
 
@@ -976,15 +766,14 @@ class RepositoryApp:
         cache["current_repository_name"] = None
         MainApp(cache["current_user_id"], cache["current_username"])
 
-
     def add(self):
         if self.dir_path != os.getcwd():
             os.chdir(self.dir_path)
-        filepaths = self.dir_path
-        user_id = cache["current_user_id"]
-        username = cache["current_username"]
-        repo_id = cache["current_repository_id"]
-        repo_name = cache["current_repository_name"]
+        # filepaths = self.dir_path
+        # user_id = cache["current_user_id"]
+        # username = cache["current_username"]
+        # repo_id = cache["current_repository_id"]
+        # repo_name = cache["current_repository_name"]
         print("Adding", cache)
         add_status = repoUtils.add(cache, ".")
         if not add_status[0]:
@@ -995,10 +784,10 @@ class RepositoryApp:
             self.verboseLabel.config(text=textvar)
 
     def commit(self):
-        user_id = cache["current_user_id"]
-        username = cache["current_username"]
-        repo_id = cache["current_repository_id"]
-        repo_name = cache["current_repository_name"]
+        # user_id = cache["current_user_id"]
+        # username = cache["current_username"]
+        # repo_id = cache["current_repository_id"]
+        # repo_name = cache["current_repository_name"]
         commit_msg = self.commit_msg_entry.get()
         commit_status = repoUtils.commit(cache, commit_msg)
         if not commit_status[0]:
@@ -1010,10 +799,10 @@ class RepositoryApp:
             self.onCloseWindow()
 
     def push(self):
-        user_id = cache["current_user_id"]
-        username = cache["current_username"]
-        repo_id = cache["current_repository_id"]
-        repo_name = cache["current_repository_name"]
+        # user_id = cache["current_user_id"]
+        # username = cache["current_username"]
+        # repo_id = cache["current_repository_id"]
+        # repo_name = cache["current_repository_name"]
         print("PUSH", cache)
         push_status = repoUtils.push(cache)
         if not push_status[0]:
@@ -1235,6 +1024,5 @@ class RepositoryApp:
         self.root.destroy()
 
 
-HomeApp()
-#MainApp("USER000001", "aditeyabaral")
-# RepositoryApp("/aditeyabaral/testrepo")
+if __name__ == "__main__":
+    HomeApp()
