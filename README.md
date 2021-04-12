@@ -91,14 +91,10 @@ New user successfully created.
 
 #### Login as User
 
-You can create users using `tgp user login username password`
+You can create users using `tgp user login [USERNAME] [PASSWORD]`
 ```bash
->>> tgp user create
-Enter username: aronyabaksy
-Enter email: abaksy@gmail.com
-Enter password: hello123
-Creating ID: USER000003
-New user successfully created.
+>>> tgp user login aronyabaksy hello123
+Welcome back, aronyabaksy
 ```
 
 #### Logout
