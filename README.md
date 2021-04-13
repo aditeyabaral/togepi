@@ -59,7 +59,7 @@ You can create users using `tgp user create`. This will create user specific dir
 >>> tgp user create
 Enter username: aronyabaksy
 Enter email: abaksy@gmail.com
-Enter password: hello123
+Enter password:
 Creating ID: USER000003
 New user successfully created.
 ```
