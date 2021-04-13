@@ -68,24 +68,14 @@ def checkCommandCLI(command):
 
 
 def checkCommandUser(command):
-    user_create_command = re.compile(r"tgp user create")
-    user_login_command = re.compile(
-        r"tgp user login ([A-Za-z0-9_]*) ([A-Za-z0-9_@$]*)")
-
-    user_function_mapping = {
-        user_create_command: userUtils.createUser,
-        user_login_command: userUtils.loginUser
-    }
-
     if command == "tgp user logout":
-        return True, logOutUserDetails, None
+        return True, logOutUserDetails
 
     if command == "tgp user create":
-        return True, userUtils.createUser, None
+        return True, userUtils.createUser
 
-    args = re.findall(user_login_command, command)
-    if args:
-        return True, userUtils.loginUser, args[0]
+    if command == "tgp user login":
+        return True, userUtils.loginUser
 
     return False, None, None
 
@@ -132,13 +122,9 @@ def runCommand(command):
         setGlobalRepositoryDetails()
         return
 
-    function_found, user_command, args = checkCommandUser(command)
+    function_found, user_command = checkCommandUser(command)
     if function_found:
-        if args is None:
-            user_id, username = user_command()
-        else:
-            username, password = args
-            user_id, username = user_command(username, password)
+        user_id, username = user_command()
         cache["current_user_id"] = user_id
         cache["current_username"] = username
         return

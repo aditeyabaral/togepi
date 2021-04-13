@@ -115,7 +115,7 @@ class HomeApp:
         self.username = self.username_entry.get()
         self.password = self.password_entry.get()
         self.user_id, self.username = userUtils.loginUser(
-            self.username, self.password)
+            [self.username, self.password])
         print(self.username, self.password)
         if self.username is None:
             messagebox.showerror("Error", "Incorrect username or password")

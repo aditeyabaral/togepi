@@ -1,3 +1,4 @@
+import getpass
 from dbUtils import userDBUtils
 import fsUtils
 import validationUtils
@@ -26,7 +27,7 @@ def createUser():
         if validationUtils.validateEmail(email):
             break
     while True:
-        password = input("Enter password: ")
+        password = getpass.getpass("Enter password: ")  #input("Enter password: ")
         if validationUtils.validatePassword(password):
             break
     user_id = generateUserID()
@@ -40,7 +41,18 @@ def createUserGUI(user_id, username, password, email):
     fsUtils.createFolder(username)
     return user_id, username
 
-def loginUser(username, password):
+
+def askLoginCredentials():
+    username = input("Enter username: ")
+    password = getpass.getpass("Enter password: ")
+    return username, password
+
+
+def loginUser(credentials=None):
+    if credentials is None:
+        username, password = askLoginCredentials()
+    else:
+        username, password = credentials
     user_id = userDB.checkUserCredentials(username, password)
     if user_id is None:
         username = None
