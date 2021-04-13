@@ -8,7 +8,7 @@ A version control system built using Python and DropBox API
 
 Togepi can be used both on command line as well as through a GUI window, however we do suggest using the CLI to access all of Togepi's features, due to certain implementation based restrictions in the GUI.
 
-Togepi supports most major version control features such as `add`, `commit`, `pull`, `push`, `status`, `clone` to name a few. The CLI also features prominent CLI utility tools to help out such as `cd`, `mkdir`, `rmdir`, `nano`, `ls` and `cat`.
+Togepi supports most major version control features such as `add`, `commit`, `pull`, `push`, `status`, `clone` to name a few. The CLI also features prominent CLI utility tools to help out such as `clear`, `cd`, `mkdir`, `rmdir`, `nano`, `ls` and `cat`.
 
 The GUI interface is basic and supports only the core features. There are no plans to extend work on the GUI since the interface was included as a course deliverable.
 
@@ -42,36 +42,11 @@ Note that if you are running it via an online database such as Heroku-PostgreSQL
 
 To run Togepi on command-line, run `python3 src/main.py`
 
+If you would like to run with the debugger, use `python3 src/main.py debug`
+
 ```bash
 Welcome to Togepi!
-                            ...:`                 
-           `....         ...    /                 
-           /   `....` ...    `  `/                
-          --        `-`     ``````:  .-.--......  
-          /`               ```````:-.```````  `/  
-          /`     ``.-.    ``..```````         .:  
- `..     `/`    --:d/    ```oo`:``````````````/   
--```--. .-`     -.:- +o+/```h+`/`````````````-`   
-:`   `.:-: `.`   `` `sss-`````.`````````````-.    
-`-`    `::..`:   .` .so/```````````````````.-     
- :```  `-    `:`-.-../-.-.``````````````````-     
-  :````:`.`   -.     ``  :-```..-.   `.--...:....`
-  `:----+o:               .-..`` :.`.---.`      --
-   :..`:os`    :-..`       `` `.:/+-``-       `.: 
-   /````..     :`...--`      -+o-/s- :```````.--  
-   /```        +-+`-::/:-`   .so`/o+ -/.```./-`   
-   +`::`   ````+/o`  -+:+-    +o+o/.``.---../     
-   /soso-``  ``-++/./+++-``````-.``````````:`     
-    oooos+.   ``/+++++:``````````..````````:      
-    `/`/sos:`  ``//:-`````````.:+++/```` `:       
-     `:`-oos+```````````````./++/o+:`  ``:        
-       --.sos/`````````````:+o/.:+o`  `-.         
-        `/os+`````````````+++o//+o-`.-.           
-     `-..``.:---```````````-::///+:-/--`          
-    :--`    `..:+-.----..----:/::.`   `.-.        
-    -+....----.               `--.     .-:.       
-                                 `....----
-
+>>>
 ```
 
 ### User Level Functions
@@ -212,6 +187,7 @@ Togepi also features prominent command line utilities to allow users to quickly 
 4. `mkdir [DIRECTORY PATH]`
 5. `rmdir [DIRECTORY PATH]`
 6. `nano [FILE PATH]`
+7. `clear` or `cls`
 
 ### Help
 Togepi also features a convenient `help` command to assist you in times of need.

@@ -1,6 +1,9 @@
 import os
 import shutil
 
+def clear(*vargs):
+    os.system("clear")
+
 
 def nano(filename):
     os.system(f"nano {filename}")

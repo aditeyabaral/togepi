@@ -1,12 +1,9 @@
 import sys
 import utils
-from cliUtils import togepi
 
 print("Welcome to Togepi!")
-togepi()
-
-DEBUG=False
-if sys.argv[1] == "debug":
+DEBUG = False
+if len(sys.argv) > 1 and sys.argv[1] == "debug":
     DEBUG = True
 
 while True:

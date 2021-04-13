@@ -50,6 +50,9 @@ def checkCommandCLI(command):
 
     }
 
+    if command in ["cls", "clear"]:
+        return True, cliUtils.clear, None
+
     if command == "help":
         return True, cliUtils.help, None
 
@@ -91,7 +94,7 @@ def checkCommandRepository(command):
         create_repo_command: repoUtils.init,
         add_files_command: repoUtils.add,
         commit_files_command: repoUtils.commit,
-        clone_command: repoUtils.clone, 
+        clone_command: repoUtils.clone,
         add_collab_command: repoUtils.addCollaborator
     }
 

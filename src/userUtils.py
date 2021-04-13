@@ -27,7 +27,8 @@ def createUser():
         if validationUtils.validateEmail(email):
             break
     while True:
-        password = getpass.getpass("Enter password: ")  #input("Enter password: ")
+        # input("Enter password: ")
+        password = getpass.getpass("Enter password: ")
         if validationUtils.validatePassword(password):
             break
     user_id = generateUserID()
@@ -35,6 +36,7 @@ def createUser():
     userDB.createUser(user_id, username, email, password)
     fsUtils.createFolder(username)
     return user_id, username
+
 
 def createUserGUI(user_id, username, password, email):
     userDB.createUser(user_id, username, email, password)
