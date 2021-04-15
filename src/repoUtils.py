@@ -437,13 +437,17 @@ def addCollaborator(cache, collab_username):
             break
     if not found_user:
         print("You are not owner of this repository. Cannot add collaborator")
-        return
-    collab_user_id = userDB.getUserID(collab_username)
+        return False, 1
+    collab_user_id = userDB.getUserID(collab_username
+    for relation in relations:
+        if relation[0]== collab_user_id:
+            return False, 2 #user to be added is already a collaborator
     if collab_user_id == '':
         print(
             f"User {collab_username} does not exist. Please check the username")
-        return
+        return False, 3
     relationDB.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
     print(f"User {collab_username} successfully added as collaborator.")
+    return True
 
 

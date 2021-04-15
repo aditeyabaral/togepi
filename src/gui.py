@@ -1011,11 +1011,18 @@ class RepositoryApp:
         collab_username = self.add_collab_entry.get()
         if collab_username == '' or collab_username is None:
             messagebox.showerror("Error", "Collaborator name cannot be empty")
-            self.onCloseWindow()
         else:
-            repoUtils.addCollaborator(cache, collab_username)
-            messagebox.showinfo("Info", "Added collaborator!")
-            self.onCloseWindow()
+            add_collab_status = repoUtils.addCollaborator(cache, collab_username)
+            if add_collab_status[0] == True:
+                messagebox.showinfo("Info", "Added collaborator!")
+            else:
+                if add_collab_status[1] == 1:
+                    messagebox.showerror("Error", "You are not owner of this repository, cannot add collaborator!")
+                elif add_collab_status[1] == 2:
+                    messagebox.showerror("Error", f"User {collab_username} is already a collaborator!")
+                elif add_collab_status[1] == 3:
+                    messagebox.showerror("Error", f"User {collab_username} does not exist! Please check username")
+        self.onCloseWindow()
 
     def onCloseWindow(self):
         self.window.destroy()
