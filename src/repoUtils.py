@@ -438,7 +438,7 @@ def addCollaborator(cache, collab_username):
     if not found_user:
         print("You are not owner of this repository. Cannot add collaborator")
         return False, 1
-    collab_user_id = userDB.getUserID(collab_username
+    collab_user_id = userDB.getUserID(collab_username)
     for relation in relations:
         if relation[0]== collab_user_id:
             return False, 2 #user to be added is already a collaborator
