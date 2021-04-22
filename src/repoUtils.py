@@ -295,8 +295,8 @@ def commit(cache, message=None):
         output_str += f"added changes: {modified_file}\n"
     adds = num_diffs["add"]
     dels = num_diffs["del"]
-    print(f"{num_files_changed} files changed: {adds} addtions(+) {dels} deletions(-)")
-    output_str += f"{num_files_changed} files changed: {adds} addtions(+) {dels} deletions(-)\n"
+    print(f"{num_files_changed} files changed: {adds} additions(+) {dels} deletions(-)")
+    output_str += f"{num_files_changed} files changed: {adds} additions(+) {dels} deletions(-)\n"
     return True, output_str
 
 
