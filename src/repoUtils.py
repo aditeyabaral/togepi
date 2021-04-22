@@ -448,6 +448,6 @@ def addCollaborator(cache, collab_username):
         return False, 3
     relationDB.createUserRepositoryRelation(collab_user_id, repo_id, "collaborator")
     print(f"User {collab_username} successfully added as collaborator.")
-    return True
+    return True, 0
 
 
