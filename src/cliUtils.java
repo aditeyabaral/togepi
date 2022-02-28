@@ -13,6 +13,7 @@ class CliUtils
 
     public void ls(String path)
     {
+        // Check for . as well as path
         String current_path = System.getProperty("user.dir");
         path = Paths.get(current_path, path).toString();
         try
@@ -153,22 +154,3 @@ class CliUtils
     System.out.println(s);
     }
 }
-
-// class CliUtilsTest
-// {
-//     public static void main(String[] args) throws IOException
-//     {
-//         CliUtils cliUtils = new CliUtils();
-//         cliUtils.clearScreen();
-//         // cliUtils.nano("test.txt");
-//         cliUtils.ls(".");
-//         cliUtils.cat("cliUtils.java");
-//         cliUtils.mkdir("test1");
-//         cliUtils.rmdir("test1");
-//         cliUtils.ls(".");
-//         cliUtils.cd("../"); System.out.println("Changes to " + System.getProperty("user.dir"));
-//         cliUtils.ls(".");
-//         cliUtils.cat("cliUtils.java");
-//         cliUtils.togepi();
-//     }
-// }
