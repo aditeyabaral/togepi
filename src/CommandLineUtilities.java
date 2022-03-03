@@ -1,7 +1,7 @@
 import java.io.*;
 import java.nio.file.*;
 
-class CliUtils
+class CommandLineUtilities
 {
     public void clearScreen()
     {
@@ -9,13 +9,11 @@ class CliUtils
         System.out.flush();
     }
 
-    // public void nano(String filename);
-
     public void ls(String path)
     {
-        // Check for . as well as path
+        // normalize paths
         String current_path = System.getProperty("user.dir");
-        path = Paths.get(current_path, path).toString();
+        path = Paths.get(current_path, path).normalize().toString();
         try
         {
             Files.list(Paths.get(path)).forEach(System.out::println);
@@ -24,6 +22,11 @@ class CliUtils
         {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    public void ls()
+    {
+        ls(".");
     }
 
     public void cat(String filename)
@@ -120,37 +123,9 @@ class CliUtils
         }
     }
 
+    // public void nano(String filename);
+
     // public void help();
 
-    public void togepi()
-    {
-        String s = "                            ...:`                 \n"
-        + "           `....         ...    /                 \n"
-        + "           /   `....` ...    `  `/                \n"
-        + "          --        `-`     ``````:  .-.--......  \n"
-        + "          /`               ```````:-.```````  `/  \n"
-        + "          /`     ``.-.    ``..```````         .:  \n"
-        + " `..     `/`    --:d/    ```oo`:``````````````/   \n"
-        + "-```--. .-`     -.:- +o+/```h+`/`````````````-`   \n"
-        + ":`   `.:-: `.`   `` `sss-`````.`````````````-.    \n"
-        + "`-`    `::..`:   .` .so/```````````````````.-     \n"
-        + " :```  `-    `:`-.-../-.-.``````````````````-     \n"
-        + "  :````:`.`   -.     ``  :-```..-.   `.--...:....`\n"
-        + "  `:----+o:               .-..`` :.`.---.`      --\n"
-        + "   :..`:os`    :-..`       `` `.:/+-``-       `.: \n"
-        + "   /````..     :`...--`      -+o-/s- :```````.--  \n"
-        + "   /```        +-+`-::/:-`   .so`/o+ -/.```./-`   \n"
-        + "   +`::`   ````+/o`  -+:+-    +o+o/.``.---../     \n"
-        + "   /soso-``  ``-++/./+++-``````-.``````````:`     \n"
-        + "    oooos+.   ``/+++++:``````````..````````:      \n"
-        + "    `/`/sos:`  ``//:-`````````.:+++/```` `:       \n"
-        + "     `:`-oos+```````````````./++/o+:`  ``:        \n"
-        + "       --.sos/`````````````:+o/.:+o`  `-.         \n"
-        + "        `/os+`````````````+++o//+o-`.-.           \n"
-        + "     `-..``.:---```````````-::///+:-/--`          \n"
-        + "    :--`    `..:+-.----..----:/::.`   `.-.        \n"
-        + "    -+....----.               `--.     .-:.       \n"
-        + "                                 `....----";
-    System.out.println(s);
-    }
+    // public void coffee();
 }

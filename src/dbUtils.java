@@ -38,27 +38,28 @@ class RepositoryDataBaseUtils
     }
 }
 
-class TestDataBaseUtils
-{
-    public static void main(String[] args) throws SQLException, ClassNotFoundException
-    {
-        Class.forName("org.postgresql.Driver");
-        String url = "jdbc:postgresql://ec2-54-83-82-187.compute-1.amazonaws.com:5432/d3au8v0r6o7dut";
-        String user = "kphftpinxhfrbj";
-        String password = "c2d60d0b6766191a629bc71e6e60bb36090ca28361052e1902bc9e78c2b53c48";
-        Connection conn = DriverManager.getConnection(url, user, password);
-        System.out.println("Connected to the database");
 
-        RepositoryDataBaseUtils rdbu = new RepositoryDataBaseUtils(conn);
+// class TestDataBaseUtils
+// {
+//     public static void main(String[] args) throws SQLException, ClassNotFoundException
+//     {
+//         Class.forName("org.postgresql.Driver");
+//         String url = "jdbc:postgresql://ec2-54-83-82-187.compute-1.amazonaws.com:5432/d3au8v0r6o7dut";
+//         String user = "kphftpinxhfrbj";
+//         String password = "c2d60d0b6766191a629bc71e6e60bb36090ca28361052e1902bc9e78c2b53c48";
+//         Connection conn = DriverManager.getConnection(url, user, password);
+//         System.out.println("Connected to the database");
 
-        rdbu.createRepository("USER#001", "test", "REPO#002", "my first repo", "test", LocalDateTime.now(), "public");
+//         RepositoryDataBaseUtils rdbu = new RepositoryDataBaseUtils(conn);
+
+//         rdbu.createRepository("USER#001", "test", "REPO#002", "my first repo", "test", LocalDateTime.now(), "public");
 
 
-        List<String> repoIDList = rdbu.getAllRepositoryID();
-        System.out.println(repoIDList);
-        for(String repoID : repoIDList)
-        {
-            System.out.println(repoID);
-        }
-    }
-}
+//         List<String> repoIDList = rdbu.getAllRepositoryID();
+//         System.out.println(repoIDList);
+//         for(String repoID : repoIDList)
+//         {
+//             System.out.println(repoID);
+//         }
+//     }
+// }
