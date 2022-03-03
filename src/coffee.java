@@ -10,17 +10,18 @@ class Coffee
 {
     String userID;
     String repositoryID;
+    CommandLineUtilities cmd;
     Coffee()
     {
         userID = null;
         repositoryID = null;
+        cmd = new CommandLineUtilities();
     }
 
     public static void main(String[] args) throws Exception
     {
         Class.forName("org.postgresql.Driver");
         
-        CommandLineUtilities cmd = new CommandLineUtilities();
         CommandRunner runner = new CommandRunner();
         runner.initCommandMaps();
 
@@ -39,7 +40,7 @@ class Coffee
             if (command.equals("exit") || command.equals("quit")) System.exit(0);
             else
             {
-                try { runner.run(coffee, cmd, command); }
+                try { runner.run(coffee, command); }
                 catch (Exception e)
                 {
                     if (debug) e.printStackTrace();

@@ -60,20 +60,20 @@ class CommandRunner
         return null;
     }
 
-    public void run(Coffee coffee, CommandLineUtilities cmd, String command) throws Exception
+    public void run(Coffee coffee, String command) throws Exception
     {
         Method method = getCLIMethod(command);
-        System.out.println(method);
+        // System.out.println(method);
         if (method != null)
         {
             String[] tempArgs = command.split(" ");
             if (tempArgs.length > 1)
             {
                 String arg = tempArgs[1];
-                method.invoke(cmd, arg);
+                method.invoke(coffee.cmd, arg);
             }
             else
-                method.invoke(cmd);
+                method.invoke(coffee.cmd);
         }
     }
 

@@ -36,7 +36,7 @@ class CommandLineUtilities
             String current_path = System.getProperty("user.dir");
             filename = Paths.get(current_path, filename).toString();
             File file = new File(filename);
-            if (file.exists())
+            if (file.exists() && file.isFile())
             {
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 String line;
