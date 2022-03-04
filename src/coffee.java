@@ -35,7 +35,7 @@ class Coffee
         while (true)
         {
             System.out.print(">>> ");
-            command = sc.nextLine();
+            command = sc.nextLine().strip();
 
             if (command.equals("exit") || command.equals("quit")) System.exit(0);
             else

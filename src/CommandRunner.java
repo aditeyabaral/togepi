@@ -27,7 +27,7 @@ class CommandRunner
         // Pattern nanoPattern = Pattern.compile("cd ([\.A-Za-z0-9\\/_]+)");
         Pattern mkdirPattern = Pattern.compile("mkdir ([\\.A-Za-z0-9\\/_]+)");
         Pattern rmdirPattern = Pattern.compile("rmdir ([\\.A-Za-z0-9\\/_]+)");
-        // Pattern rmPattern = Pattern.compile("rm ([\.A-Za-z0-9\\/_]+)");
+        Pattern rmPattern = Pattern.compile("rm ([\\.A-Za-z0-9\\/_]+)");
 
         commandsCLI = new HashMap<Pattern, Method>();
         commandsCLI.put(cdPattern, CommandLineUtilities.class.getMethod("cd", String.class));
@@ -36,7 +36,7 @@ class CommandRunner
         // commandsCLI.put(nanoPattern, CommandLineUtilities.class.getMethod("nano", String.class));
         commandsCLI.put(mkdirPattern, CommandLineUtilities.class.getMethod("mkdir", String.class));
         commandsCLI.put(rmdirPattern, CommandLineUtilities.class.getMethod("rmdir", String.class));
-        // commandsCLI.put(rmPattern, CommandLineUtilities.class.getMethod("rm", String.class));
+        commandsCLI.put(rmPattern, CommandLineUtilities.class.getMethod("rm", String.class));
     }
 
     public Method getCLIMethod(String command) throws Exception
@@ -75,7 +75,11 @@ class CommandRunner
             else
                 method.invoke(coffee.cmd);
         }
+        else
+            throw new Exception();
     }
+
+    
 
     // public void setRepositoryDetails(Coffee coffee);
 

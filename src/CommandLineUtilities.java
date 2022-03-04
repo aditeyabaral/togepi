@@ -79,6 +79,28 @@ class CommandLineUtilities
         }
     }
 
+    public void rm(String path)
+    {
+        try
+        {
+            String current_path = System.getProperty("user.dir");
+            Path file_path = Paths.get(current_path, path);
+            File file = new File(file_path.toString());
+            if (file.exists() && file.isFile())
+            {
+                file.delete();
+            }
+            else
+            {
+                System.out.println("Error: File does not exist");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void rmdir(String path)
     {
         try
