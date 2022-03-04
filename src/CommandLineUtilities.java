@@ -34,7 +34,7 @@ class CommandLineUtilities
         try
         {
             String current_path = System.getProperty("user.dir");
-            filename = Paths.get(current_path, filename).toString();
+            filename = Paths.get(current_path, filename).normalize().toString();
             File file = new File(filename);
             if (file.exists() && file.isFile())
             {
@@ -62,7 +62,7 @@ class CommandLineUtilities
         try
         {
             String current_path = System.getProperty("user.dir");
-            Path folder_path = Paths.get(current_path, path);
+            Path folder_path = Paths.get(current_path, path).normalize();
             File folder = new File(folder_path.toString());
             if (!folder.exists())
             {
@@ -84,7 +84,7 @@ class CommandLineUtilities
         try
         {
             String current_path = System.getProperty("user.dir");
-            Path file_path = Paths.get(current_path, path);
+            Path file_path = Paths.get(current_path, path).normalize();
             File file = new File(file_path.toString());
             if (file.exists() && file.isFile())
             {
@@ -106,7 +106,7 @@ class CommandLineUtilities
         try
         {
             String current_path = System.getProperty("user.dir");
-            Path folder_path = Paths.get(current_path, path);
+            Path folder_path = Paths.get(current_path, path).normalize();
             File folder = new File(folder_path.toString());
             if (folder.exists())
             {
