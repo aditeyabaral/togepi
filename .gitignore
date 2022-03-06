@@ -10,3 +10,5 @@ testrepo*/
 .env
 
 *.class
+.coffee
+test*

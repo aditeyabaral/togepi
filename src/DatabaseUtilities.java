@@ -19,7 +19,7 @@ class DatabaseUtilities
 
     public void connect() throws SQLException, ClassNotFoundException
     {
-        Class.forName("org.postgresql.Driver");
+        // Class.forName("org.postgresql.Driver");
         conn = DriverManager.getConnection(url, user, password);
     }
 }

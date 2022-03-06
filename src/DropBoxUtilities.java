@@ -15,9 +15,9 @@ class DropBoxUtilities
     DbxClientV2 client;
     DbxRequestConfig config;
 
-    public DropBoxUtilities(String API_KEY)
+    public DropBoxUtilities()
     {
-        this.API_KEY = API_KEY;
+        this.API_KEY = "sl.BDQgLFze-r8ePBvhVDsLK8bGczYGYoSULV4OVQQ88i8WeSYrTXYtfgIHsg07SyHcAXo4OqBxbl9vtsad8dThW7J3iHS78SiUf5omEnVchoBXzRIrPYsCcwGqmwqYgUJZY6bMyZOTia3B";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -138,39 +138,5 @@ class DropBoxUtilities
         downloadedFolder.close();
         File f = new File(localPath);
         f.delete();
-    }
-}
-
-class TestDropBoxUtilities
-{
-    public static void main(String[] args) throws DbxException, ClassNotFoundException, IOException, InterruptedException
-    {
-        String DROPBOX_API_KEY = "sl.BC509ENAFwrMLqg-mI4OcUnRLlZgSKFXEJQxpibgdYPBTh-2a1mhQGnoP1b4HeT_6WsenSeU310qGbVe4OEKltsxUUJzgTkUNkE48sMslVNonkFsIPrqZo-RSguHA44a9XaNB60Oxi_e";
-        DropBoxUtilities dbu = new DropBoxUtilities(DROPBOX_API_KEY);
-
-        // try {
-        //     dbu.downloadFile("sonobois.py", "/siamese_pretraining.py");
-        // } catch (DbxException e) {
-        //     e.printStackTrace();
-        // } catch (ClassNotFoundException e) {
-        //     e.printStackTrace();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
-
-        // String content = dbu.getFileContent("/siamese_pretraining.py");
-        // System.out.println(content);
-
-        // dbu.uploadFile("../app/database.py", "/database.py");
-
-        // dbu.createFolder("/test_folder2");
-
-        // ArrayList<String> fileList = dbu.listDropBoxFiles("/test_folder2");
-        // System.out.println(fileList);
-
-        // dbu.downloadFolder("./test.zip", "/test_folder");
-
-        // ArrayList<String> output = dbu.uploadFolder("../src", "/uploaded_folder");
-        // System.out.println(output);
     }
 }

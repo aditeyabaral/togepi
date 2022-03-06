@@ -19,6 +19,16 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
         return usernames;
     }
 
+    public ArrayList<String> getAllUserIDs() throws SQLException
+    {
+        ArrayList<String> userIDs = new ArrayList<String>();
+        String query = "SELECT _id FROM " + tableName;
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next()) userIDs.add(rs.getString("userID"));
+        return userIDs;
+    }
+
     public ArrayList<String> getAllEmailAddresses() throws SQLException
     {
         ArrayList<String> emailAddresses = new ArrayList<String>();
@@ -27,6 +37,17 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
         ResultSet rs = pstmt.executeQuery();
         while(rs.next()) emailAddresses.add(rs.getString("email"));
         return emailAddresses;
+    }
+
+    public void createUser(String userID, String username, String emailAddress, String password) throws SQLException
+    {
+        String query = "INSERT INTO " + tableName + " (_id, username, email, password) VALUES (?, ?, ?, ?)";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, userID);
+        pstmt.setString(2, username);
+        pstmt.setString(3, emailAddress);
+        pstmt.setString(4, password);
+        pstmt.executeUpdate();
     }
 
     public Boolean validateUsername(String username) throws SQLException
@@ -75,7 +96,7 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
 
     public Boolean validatePassword(String password) throws SQLException
     {
-        Pattern pattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$");
+        Pattern pattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
         Matcher matcher = pattern.matcher(password);
         boolean validPasswordCheck = matcher.matches();
         if (!validPasswordCheck)
@@ -85,21 +106,16 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
         }
         return true;
     }
-}
 
-class TestDeveloperDatabaseUtilities
-{
-    public static void main(String[] args) throws SQLException, ClassNotFoundException
+    public String validateUserCredentials(String username, String password) throws SQLException
     {
-        Class.forName("org.postgresql.Driver");
-        DeveloperDatabaseUtilities ddbu = new DeveloperDatabaseUtilities();
-        ddbu.connect();
-        ArrayList<String> usernames = ddbu.getAllUsernames();
-        for(String username : usernames)
-        {
-            System.out.println(username);
-        }
-        System.out.println(ddbu.validateUsername("yashichawlaa"));
-        System.out.println(ddbu.validateEmailAddress("yashichawla1@gmail.com"));
+        String query = "SELECT _id FROM " + tableName + " WHERE username = ? AND password = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, username);
+        pstmt.setString(2, password);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("_id");
+        return null;
     }
 }
+

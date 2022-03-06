@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.lang.*;
 import java.util.regex.*;
@@ -13,10 +14,27 @@ class CommandRunner
         generateCLICommandMap();
     }
 
-    public void logoutUser(Coffee coffee)
+    public void setRepositoryDetails(Coffee coffee) throws Exception
     {
-        coffee.userID = null;
-        coffee.repositoryID = null;
+        String currentPath = System.getProperty("user.dir");
+        currentPath = Paths.get(currentPath).normalize().toString();
+        File currentDirectory = new File(currentPath);
+        File[] files = currentDirectory.listFiles();
+        Boolean found = false;
+        for (File file : files)
+        {
+            if (file.isDirectory() && file.getName().equals(".coffee"))
+            {
+                found = true;
+                File infoFile = new File(Paths.get(file.getPath(), "cfeinfo.txt").normalize().toString());
+                String content = new String(Files.readAllBytes(infoFile.toPath()));
+                String[] lines = content.split("\n");
+                String repositoryID = lines[0].split(",")[1];
+                coffee.repositoryID = repositoryID;
+                break;
+            }
+        }
+        if (!found) coffee.repositoryID = null; // is this needed?
     }
 
     public void generateCLICommandMap() throws Exception
@@ -42,7 +60,7 @@ class CommandRunner
     public Method getCLIMethod(String command) throws Exception
     {
 
-        if (command.equals("ls")) return CommandLineUtilities.class.getDeclaredMethod("ls");
+        if (command.equals("ls")) return CommandLineUtilities.class.getMethod("ls");
         else if (command.equals("cls")) return CommandLineUtilities.class.getMethod("clearScreen");
         else if (command.equals("clear")) return CommandLineUtilities.class.getMethod("clearScreen");
         // else if (command.equals("help")) return CommandLineUtilities.class.getMethod("help");
@@ -60,12 +78,22 @@ class CommandRunner
         return null;
     }
 
+    public Method getDeveloperMethod(String command) throws Exception
+    {
+        if (command.equals("cfe user logout")) return DeveloperUtilities.class.getMethod("logoutUser", Coffee.class);
+        else if (command.equals("cfe user login")) return DeveloperUtilities.class.getMethod("loginUser", Coffee.class);
+        else if (command.equals("cfe user register")) return DeveloperUtilities.class.getMethod("registerUser", Coffee.class);
+        else return null;
+    }
+
     public void run(Coffee coffee, String command) throws Exception
     {
-        Method method = getCLIMethod(command);
-        // System.out.println(method);
+        Method method;
+        
+        method = getCLIMethod(command);
         if (method != null)
         {
+            // System.out.println(method);
             String[] tempArgs = command.split(" ");
             if (tempArgs.length > 1)
             {
@@ -74,13 +102,19 @@ class CommandRunner
             }
             else
                 method.invoke(coffee.cmd);
+            setRepositoryDetails(coffee);
+            return;
         }
-        else
-            throw new Exception();
+
+        method = getDeveloperMethod(command);
+        if (method != null)
+        {
+            // System.out.println(method);
+            method.invoke(coffee.dev, coffee);
+            return;
+        }
+
+        throw new Exception();
     }
-
-    
-
-    // public void setRepositoryDetails(Coffee coffee);
 
 }
