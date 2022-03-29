@@ -16,12 +16,12 @@ userDB = userDBUtils()
 
 
 
-def getRepoIdFromDirectory():
-    with open(f".togepi/tgpinfo.txt") as f:
-        content = f.read().strip().split('\n')
-        _, repo_id = content[0].split(',')
-        repo_id = repo_id.strip()
-    return repo_id
+# def getRepoIdFromDirectory():
+#     with open(f".togepi/tgpinfo.txt") as f:
+#         content = f.read().strip().split('\n')
+#         _, repo_id = content[0].split(',')
+#         repo_id = repo_id.strip()
+#     return repo_id
 
 
 def getDiff(cloud_file_content, local_file_content):

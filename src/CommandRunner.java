@@ -114,6 +114,26 @@ class CommandRunner
             return;
         }
 
+        method = getRepositoryMethod(command);
+        if (method != null)
+        {
+            // System.out.println(method);
+            if (coffee.repositoryID == null)
+                System.out.println("You are not logged in to a repository. Please login to a repository first.");
+            else
+            {
+                String[] tempArgs = command.split(" ");
+                if (tempArgs.length > 1)
+                {
+                    String arg = tempArgs[1];
+                    method.invoke(coffee.repo, coffee, arg);
+                }
+                else
+                    method.invoke(coffee.repo, coffee);
+            return;
+            }
+        }
+
         throw new Exception();
     }
 
