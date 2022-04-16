@@ -50,6 +50,26 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
         pstmt.executeUpdate();
     }
 
+    public String getUsernameFromUserId(String userID) throws SQLException
+    {
+        String query = "SELECT username FROM " + tableName + " WHERE _id = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, userID);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("username");
+        else return null;
+    }
+
+    public String getUserIdFromUsername(String username) throws SQLException
+    {
+        String query = "SELECT _id FROM " + tableName + " WHERE username = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("_id");
+        else return null;
+    }
+
     public Boolean validateUsername(String username) throws SQLException
     {
 
@@ -119,3 +139,13 @@ class DeveloperDatabaseUtilities extends DatabaseUtilities
     }
 }
 
+// class TestDeveloperDatabaseUtilities
+// {
+//     public static void main(String[] args) throws Exception
+//     {
+//         DeveloperDatabaseUtilities db = new DeveloperDatabaseUtilities();
+//         db.connect();
+//         System.out.println(db.getUserIdFromUsername("adi"));
+//         System.out.println(db.getUsernameFromUserId("64bddb9f-a1d6-11ec-9def-f99dab75ea53"));
+//     }
+// }
