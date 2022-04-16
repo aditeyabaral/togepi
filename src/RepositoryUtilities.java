@@ -2,6 +2,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.lang.*;
+import java.time.*;
 import com.fasterxml.uuid.*;
 
 class RepositoryUtilities
@@ -16,6 +17,7 @@ class RepositoryUtilities
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 String line = br.readLine();
                 line = line.trim();
+                line = line.split(",")[1];
                 br.close();
                 return line;
             }
