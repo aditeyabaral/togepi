@@ -18,9 +18,14 @@ class Coffee
     CommandRunner runner;
     CommandLineUtilities cmd;
     DeveloperUtilities dev;
-    DeveloperDatabaseUtilities devDB;
     DropBoxUtilities dropBox;
     RepositoryUtilities repo;
+
+    CommitDatabaseUtilities commitDB;
+    DeveloperDatabaseUtilities devDB;
+    RelationDatabaseUtilities relDB;
+    FileDatabaseUtilities fileDB;
+    RepositoryDatabaseUtilities repoDB;
 
     private Coffee()
     {
@@ -29,9 +34,14 @@ class Coffee
         runner = new CommandRunner();
         cmd = new CommandLineUtilities();
         dev = new DeveloperUtilities();
-        devDB = new DeveloperDatabaseUtilities();
         dropBox = new DropBoxUtilities();
         repo = new RepositoryUtilities();
+
+        commitDB = new CommitDatabaseUtilities();
+        devDB = new DeveloperDatabaseUtilities();
+        relDB = new RelationDatabaseUtilities();
+        fileDB = new FileDatabaseUtilities();
+        repoDB = new RepositoryDatabaseUtilities();
     }
 
     private static Coffee coffeeInstance = new Coffee();
@@ -46,7 +56,11 @@ class Coffee
         System.out.println("Welcome to Coffee!");
 
         coffeeInstance.runner.initCommandMaps();
+        coffeeInstance.commitDB.connect();
         coffeeInstance.devDB.connect();
+        coffeeInstance.relDB.connect();
+        coffeeInstance.fileDB.connect();
+        coffeeInstance.repoDB.connect();
         
         String command;
         while (true)
