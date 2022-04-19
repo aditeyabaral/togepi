@@ -2,6 +2,8 @@ import java.nio.*;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;
+import java.time.format.*;
+import java.time.*;
 import java.util.stream.*;
 import com.dropbox.core.*;
 import com.dropbox.core.v2.*;
@@ -17,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BDrNOM7-n0dNCnBTGe8F0bRP_r6CDkAvtTD7arCwC7UpwI1iFb5DoSSyG0xnGETlhQRGsobpKlFx-q9kYI8ga6SisxUohv9ew042iWjn701l1b_aj8vaX9cAWKRjZmJ5a8JRf-sluiFg";
+        this.API_KEY = "sl.BGCVtdmr8E28eEvAxu2taZZs5X8FVCvSnDUBIdyily6oFT3u1XJlYcfvklYderP2bzo0PoFwtlAsUyiS_LLZkYn4h5YA9AlySQqro9oimftvOX9TdliNjjxsBro_npvOwHuWMTuI81XU";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -123,9 +125,47 @@ class DropBoxUtilities
         return outputString;
     }
 
-    // public LocalDateTime getLastCloudCommitTime(String dropboxPath) throws DbxException, ClassNotFoundException, IOException
+    public LocalDateTime getLastDropBoxCommitTime(String dropboxPath) throws DbxException, ClassNotFoundException, IOException
+    {
+        if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
+        dropboxPath = dropboxPath + "/.coffee";
+        String fileName, timestamp;
+        ArrayList<String> fileList = listDropBoxFiles(dropboxPath);
+        ArrayList<LocalDateTime> commitTimes = new ArrayList<LocalDateTime>();
+        for (String file : fileList)
+        {
+            fileName = file.substring(dropboxPath.length() + 1);
+            if (fileName.equals(".bean")) continue;
+            String[] fileNameSplit = fileName.split("---");
+            timestamp = fileNameSplit[fileNameSplit.length - 1];
+            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
+            commitTimes.add(localDateTime);
+        }
+        commitTimes.sort(Comparator.naturalOrder());
+        int num_commits = commitTimes.size();
+        if (num_commits == 0) return null;
+        return commitTimes.get(commitTimes.size() - 1);
+    }
 
-    // public LocalDateTime getLastLocalCommitTime(String localPath) throws DbxException, ClassNotFoundException, IOException
+    public LocalDateTime getLastLocalCommitTime() throws DbxException, ClassNotFoundException, IOException
+    {
+        ArrayList<LocalDateTime> commitTimes = new ArrayList<LocalDateTime>();
+        File commitDirectory = new File(".coffee");
+        String fileName, timestamp;
+        for (File file : commitDirectory.listFiles())
+        {
+            fileName = file.getName();
+            if (fileName.equals(".bean")) continue;
+            String[] fileNameSplit = fileName.split("---");
+            timestamp = fileNameSplit[fileNameSplit.length - 1];
+            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
+            commitTimes.add(localDateTime);
+        }
+        commitTimes.sort(Comparator.naturalOrder());
+        int num_commits = commitTimes.size();
+        if (num_commits == 0) return null;
+        return commitTimes.get(commitTimes.size() - 1);
+    }
 
     public void downloadFolder(String localPath, String dropboxPath) throws DbxException, ClassNotFoundException, IOException, InterruptedException
     {

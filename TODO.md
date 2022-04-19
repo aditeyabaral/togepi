@@ -2,9 +2,9 @@
     - [ ] RepoUtils
 
 - [ ] DropBoxUtilities
-    - [ ] getLocalCommitTime
-    - [ ] getDropBoxCommitTime
-    
+    - [x] getLocalCommitTime
+    - [x] getDropBoxCommitTime
+
 - [ ] RepoUtils
     - [ ] getRepoOwner
     - [ ] init
