@@ -67,7 +67,7 @@ class CommandRunner
         else if (command.equals("cls")) return CommandLineUtilities.class.getMethod("clearScreen");
         else if (command.equals("clear")) return CommandLineUtilities.class.getMethod("clearScreen");
         // else if (command.equals("help")) return CommandLineUtilities.class.getMethod("help");
-        // else if (command.equals("coffee")) return CommandLineUtilities.class.getMethod("coffee");
+        else if (command.equals("coffee")) return CommandLineUtilities.class.getMethod("coffee");
 
         for (Map.Entry<Pattern, Method> entry : commandsCLI.entrySet())
         {
