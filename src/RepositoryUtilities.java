@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.*;
 import java.sql.*;
 import java.util.*;
 import java.lang.*;
@@ -151,7 +152,7 @@ class RepositoryUtilities
     {
         try
         {
-            File file = new File(".coffee/.bean");
+            File file = new File(repoName + "/.coffee/.bean");
             if (!file.exists()) file.createNewFile();
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             bw.write("repositoryId," + repoId); bw.newLine();
@@ -170,9 +171,65 @@ class RepositoryUtilities
         }
     }
 
-    public String getRepositoryOwner(Coffee coffee, String repositoryId)
+    public void init(Coffee coffee, String repoName) throws Exception
     {
-        return null; // implement RelationDatabaseUtilities first
+        System.out.println("Initializing repository " + repoName);
+        String userID = coffee.userID;
+        String username = coffee.devDB.getUsernameFromUserId(userID);
+        
+        if (coffee.repoDB.checkUserHasRepository(userID, repoName))
+        {
+            System.out.println("Error: Repository already exists! Repository names have to be unique.");
+            return;
+        }
+
+        if (repoName.length() > 50)
+        {
+            System.out.println("Error: Repository name cannot be more than 50 characters long.");
+            return;
+        }
+
+        coffee.cmd.mkdir(repoName);
+        coffee.cmd.mkdir(repoName + "/.coffee");
+        String repoId = generateRepositoryID();
+        
+        Scanner sc = new Scanner(System.in);
+        
+        String description = "";
+        String descriptionChoice;
+        System.out.print("Enter repository description [y/n]: ");
+        descriptionChoice = sc.nextLine().toLowerCase();
+        if (descriptionChoice.equals("y"))
+        {
+            System.out.print("Enter repository description [150 characters]: ");
+            description = sc.nextLine();
+            if (description.length() > 150)
+            {
+                System.out.println("Error: Repository description cannot be more than 150 characters long. Truncating description.");
+                description = description.substring(0, 150);
+            }
+        }
+
+        String url = "/" + username + "/" + repoName;
+        LocalDateTime createTime = LocalDateTime.now();
+        
+        String visibility = "public";
+        String visibilityChoice;
+        System.out.print("Enter repository visibility [public/private]: ");
+        visibilityChoice = sc.nextLine().toLowerCase();
+        if (visibilityChoice.equals("private")) visibility = "private";
+        else if (visibilityChoice.equals("public")) visibility = "public";
+        else
+        {
+            System.out.println("Error: Invalid visibility. Defaulting to public.");
+            visibility = "public";
+        }
+    
+        createBeanFile(userID, repoName, repoId, description, url, createTime, visibility);
+        coffee.repoDB.createRepository(repoId, repoName, description, url, createTime, visibility, userID);
+        coffee.relDB.createUserRepositoryRelation(userID, repoId, "owner");
+        coffee.dropBox.uploadFolder(repoName, username);
+        System.out.println("Repository created successfully!");
     }
 }
 
@@ -180,12 +237,12 @@ class RepositoryUtilities
 // {
 //     public static void main(String[] args) throws Exception
 //     {
+//         Class.forName("org.postgresql.Driver");
 //         RepositoryUtilities ru = new RepositoryUtilities();
-//         System.out.println(ru.getRepositoryIdFromLocalClone());
-//         String diff = ru.getDiffBetweenFiles("repoUtils.py", "repoUtils2.py");
-//         HashMap<String, Integer> diffMap = ru.checkFileIsModified(diff);
-//         System.out.println(diffMap);
-//         String repoId = ru.generateRepositoryID();
-//         System.out.println(repoId);
+//         Coffee coffee = new Coffee();
+//         coffee.userID = "181b0f1e-9d7a-11ec-8e79-b11667294a65";
+//         coffee.repositoryID = "1";
+//         coffee.devDB.connect();
+//         ru.init(coffee, "test");
 //     }
 // }

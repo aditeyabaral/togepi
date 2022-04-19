@@ -13,6 +13,7 @@ class CommandRunner
     public void initCommandMaps() throws Exception
     {
         generateCLICommandMap();
+        generateRepoCommandMap();
     }
 
     public void setRepositoryDetails(Coffee coffee) throws Exception
@@ -27,7 +28,8 @@ class CommandRunner
             if (file.isDirectory() && file.getName().equals(".coffee"))
             {
                 found = true;
-                File infoFile = new File(Paths.get(file.getPath(), "cfeinfo.txt").normalize().toString());
+                File infoFile = new File(Paths.get(file.getPath(), ".bean").normalize().toString());
+                if (!infoFile.exists()) return;
                 String content = new String(Files.readAllBytes(infoFile.toPath()));
                 String[] lines = content.split("\n");
                 String repositoryID = lines[0].split(",")[1];
@@ -98,7 +100,7 @@ class CommandRunner
         commandsRepo = new HashMap<Pattern, Method>();
     
         // TODO: implement all
-        commandsRepo.put(createRepoPattern, RepositoryDatabaseUtilities.class.getMethod("createRepository", String.class));
+        commandsRepo.put(createRepoPattern, RepositoryUtilities.class.getMethod("init", Coffee.class, String.class));
         // commandsRepo.put(addFilesPattern, RepositoryDatabaseUtilities.class.getMethod("add", String.class));
         // commandsRepo.put(commitFilesPattern, RepositoryDatabaseUtilities.class.getMethod("commit", String.class));
         // commandsRepo.put(clonePattern, RepositoryDatabaseUtilities.class.getMethod("clone", String.class));
@@ -152,25 +154,25 @@ class CommandRunner
             return;
         }
 
-        // method = getRepositoryMethod(command);
-        // if (method != null)
-        // {
-        //     // System.out.println(method);
-        //     if (coffee.repositoryID == null)
-        //         System.out.println("You are not logged in to a repository. Please login to a repository first.");
-        //     else
-        //     {
-        //         String[] tempArgs = command.split(" ");
-        //         if (tempArgs.length > 1)
-        //         {
-        //             String arg = tempArgs[1];
-        //             method.invoke(coffee.repo, coffee, arg);
-        //         }
-        //         else
-        //             method.invoke(coffee.repo, coffee);
-        //     return;
-        //     }
-        // }
+        method = getRepositoryMethod(command);
+        if (method != null)
+        {
+            System.out.println(method);
+            if (coffee.userID == null)
+                System.out.println("You are not logged in. Please login first.");
+            else
+            {
+                String[] tempArgs = command.split(" ");
+                if (tempArgs.length > 1)
+                {
+                    String arg = tempArgs[2];
+                    method.invoke(coffee.repo, coffee, arg);
+                }
+                else
+                    method.invoke(coffee.repo, coffee);
+            return;
+            }
+        }
 
         throw new Exception();
     }

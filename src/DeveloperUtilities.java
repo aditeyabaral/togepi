@@ -87,7 +87,7 @@ class DeveloperUtilities
 
         String userID = generateUserID();
         coffee.devDB.createUser(userID, username, emailAddress, password);
-        coffee.dropBox.createFolder("/" + userID);
+        coffee.dropBox.createFolder("/" + username);
         coffee.userID = userID;
         System.out.println("Logged in successfully. Welcome, " + username + "!");
         // return username

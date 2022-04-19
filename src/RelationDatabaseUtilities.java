@@ -43,6 +43,16 @@ class RelationDatabaseUtilities extends DatabaseUtilities
         }
         return relations;
     }
+
+    public String getRepositoryOwnerFromRepositoryId(String repositoryId) throws SQLException
+    {
+        String query = "SELECT developer_id FROM " + tableName + " WHERE repository_id = ? AND relation = 'owner'";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, repositoryId);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("developer_id");
+        else return null;
+    }
 }
 
 // class TestRelationDatabaseUtilities
@@ -56,5 +66,6 @@ class RelationDatabaseUtilities extends DatabaseUtilities
 //         System.out.println(rdu.getUserRepositoryRelation("64bddb9f-a1d6-11ec-9def-f99dab75ea53", "1"));
 //         System.out.println(rdu.getUserRepositoryRelation("181b0f1e-9d7a-11ec-8e79-b11667294a65", "1"));
 //         System.out.println(rdu.getAllRelations("1"));
+//         System.out.println(rdu.getRepositoryOwnerFromRepositoryId("1"));
 //     }
 // }

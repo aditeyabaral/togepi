@@ -15,58 +15,6 @@ relationDB = relationDBUtils()
 userDB = userDBUtils()
 
 
-def getRepoOwner(repo_id):
-    relations = relationDB.getAllRelations(repo_id)
-    owner = ''
-    for relation in relations:
-        if relation[-1] == "owner":
-            owner_id = relation[0]
-            break
-    owner_name = userDB.getUsername(owner_id)
-    return owner, owner_name
-
-
-def init(cache, repo_name):
-    user_id = cache["current_user_id"]
-    username = cache["current_username"]
-    if repoDB.checkUserRepositoryExists(user_id, repo_name):
-        print("Repository names have to be unique per user.")
-        return False
-    if len(repo_name) > 50:
-        print("Repository Name cannot be over 50 chars long")
-        return False
-    cliUtils.mkdir(repo_name)
-    cliUtils.mkdir(os.path.join(repo_name, ".togepi"))
-    repo_id = generateRepositoryID()
-    description = input("Enter repository description? [y/n]: ")
-    if description.lower() == 'n':
-        description = None
-    else:
-        description = input("Enter repository description (under 150 chars): ")
-        if len(description) > 150:
-            print("Description must be under 150 chars. Truncating description..")
-            description = description[:150]
-    url = f"/{username}/{repo_name}"
-    create_time = datetime.utcnow()
-    visibility = input("Enter repository visibility [public/private]: ")
-
-    if visibility not in ["public", "private"]:
-        print("Invalid option. Resetting to public.")
-        visibility = "public"
-
-    createInfoFile(user_id, repo_name, repo_id, description,
-                   url, create_time, visibility)
-    repoDB.createRepository(user_id, repo_name, repo_id,
-                             description, url, create_time, visibility)
-    relationDB.createUserRepositoryRelation(user_id, repo_id)
-
-    dropbox_path = f"/{username}/{repo_name}/"
-    # before uploading track the info file
-    local_path = os.path.join(os.getcwd(), repo_name)
-    fsUtils.uploadFolder(local_path, dropbox_path)
-    return True
-
-
 def add(cache, filepaths):
 
     # check if user_id is collaborator/owner

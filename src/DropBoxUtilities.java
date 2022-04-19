@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGCVtdmr8E28eEvAxu2taZZs5X8FVCvSnDUBIdyily6oFT3u1XJlYcfvklYderP2bzo0PoFwtlAsUyiS_LLZkYn4h5YA9AlySQqro9oimftvOX9TdliNjjxsBro_npvOwHuWMTuI81XU";
+        this.API_KEY = "sl.BGAYrlyRORI85q7qTdZ8Jy-0S3Zcb4plhIXhEbgYrF4Ph0ERyxOtCT2WTErVMz_Z1q4c8dvWMoR0CIjPe1Y00jcYOOcV5fr5I1B4A1DVyPMq1aZATHRN0hw1ReMmh9XXalYMPw4U8SGE";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -136,7 +136,7 @@ class DropBoxUtilities
         {
             fileName = file.substring(dropboxPath.length() + 1);
             if (fileName.equals(".bean")) continue;
-            String[] fileNameSplit = fileName.split("---");
+            String[] fileNameSplit = fileName.split("$");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
             LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
             commitTimes.add(localDateTime);
@@ -156,7 +156,7 @@ class DropBoxUtilities
         {
             fileName = file.getName();
             if (fileName.equals(".bean")) continue;
-            String[] fileNameSplit = fileName.split("---");
+            String[] fileNameSplit = fileName.split("$");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
             LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
             commitTimes.add(localDateTime);
