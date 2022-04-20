@@ -72,6 +72,16 @@ class RepositoryDatabaseUtilities extends DatabaseUtilities
         }
         else return null;
     }
+
+    public String getRepositoryNameFromId(String repoId) throws SQLException
+    {
+        String query = "SELECT name FROM " + tableName + " WHERE _id = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, repoId);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("name");
+        else return null;
+    }
 }
 
 // class TestRepositoryDatabaseUtilities

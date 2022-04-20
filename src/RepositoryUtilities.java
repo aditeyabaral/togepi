@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.*;
 import java.lang.*;
 import java.time.*;
+import com.dropbox.core.*;
 import com.fasterxml.uuid.*;
 
 class RepositoryUtilities
@@ -93,6 +94,36 @@ class RepositoryUtilities
                 line = br.readLine();
             }
             return sb.toString();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public String getDiffBetweenFileContents(String content1, String content2)
+    {
+        String id1 = Generators.timeBasedGenerator().generate().toString();
+        String id2 = Generators.timeBasedGenerator().generate().toString();
+        String file1 = id1+".txt";
+        String file2 = id2+".txt";
+
+        try
+        {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file1));
+            bw.write(content1);
+            bw.close();
+            bw = new BufferedWriter(new FileWriter(file2));
+            bw.write(content2);
+            bw.close();
+
+            String diff = getDiffBetweenFiles(file1, file2);
+            File f1 = new File(file1);
+            f1.delete();
+            File f2 = new File(file2);
+            f2.delete();
+            return diff;
         }
         catch (Exception e)
         {
@@ -231,18 +262,158 @@ class RepositoryUtilities
         coffee.dropBox.uploadFolder(repoName, username);
         System.out.println("Repository created successfully!");
     }
-}
 
-// class TestRepositoryUtilities
-// {
-//     public static void main(String[] args) throws Exception
-//     {
-//         Class.forName("org.postgresql.Driver");
-//         RepositoryUtilities ru = new RepositoryUtilities();
-//         Coffee coffee = new Coffee();
-//         coffee.userID = "181b0f1e-9d7a-11ec-8e79-b11667294a65";
-//         coffee.repositoryID = "1";
-//         coffee.devDB.connect();
-//         ru.init(coffee, "test");
-//     }
-// }
+    public void commit(Coffee coffee) throws SQLException, DbxException, IOException, FileNotFoundException, ClassNotFoundException
+    {
+        String userID = coffee.userID;
+        String repositoryID = coffee.repositoryID;
+        String repositoryName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
+
+        String message = "";
+        String messageChoice;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter commit message [y/n]: ");
+        messageChoice = sc.nextLine().toLowerCase();
+        if (messageChoice.equals("y"))
+        {
+            System.out.print("Enter commit message [150 characters]: ");
+            message = sc.nextLine();
+            if (message.length() > 150)
+            {
+                System.out.println("Error: Commit message cannot be more than 150 characters long. Truncating message.");
+                message = message.substring(0, 150);
+            }
+        }
+
+        String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
+        if (!(relation.equals("owner") || relation.equals("collaborator")))
+        {
+            System.out.println("Error: You do not have commit acccess to this repository.");
+            return;
+        }
+        
+        String ownerId = coffee.relDB.getRepositoryOwnerFromRepositoryId(repositoryID);
+        String ownerName = coffee.devDB.getUsernameFromUserId(ownerId);
+
+        ArrayList<String> trackedFiles = coffee.fileDB.getTrackedFiles(repositoryID);
+        HashMap<String, String> fileDiffs = new HashMap<String, String>();
+        int numFilesModified = 0;
+        HashMap<String, Integer> numDiffs = new HashMap<String, Integer>();
+        numDiffs.put("additions", 0);
+        numDiffs.put("deletions", 0);
+
+        BufferedReader br;
+        File fileObject;
+        String cloudFilePath;
+        String cloudFileContent;
+        String diff;
+        for(String file : trackedFiles)
+        {
+            fileObject = new File(file);
+            br = new BufferedReader(new FileReader(fileObject));
+            String fileContent = "";
+            String line;
+            while((line = br.readLine()) != null) fileContent += line + "\n";
+            br.close();
+
+            cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + file;
+            cloudFileContent = coffee.dropBox.getFileContent(cloudFilePath);
+            diff = getDiffBetweenFileContents(fileContent, cloudFileContent);
+            HashMap<String, Integer> diffMap = checkFileIsModified(diff);
+
+            if (diffMap.get("modified") > 0)
+            {
+                fileDiffs.put(file, diff);
+                long lastModifiedLong = fileObject.lastModified();
+                LocalDateTime lastModified = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastModifiedLong), ZoneId.systemDefault());
+                coffee.fileDB.updateFileModifiedTime(repositoryID, file, lastModified);
+                numFilesModified++;
+                numDiffs.put("additions", numDiffs.get("additions") + diffMap.get("additions"));
+                numDiffs.put("deletions", numDiffs.get("deletions") + diffMap.get("deletions"));
+            }
+        }
+
+        String commitId = generateCommitID();
+        LocalDateTime commitTime = LocalDateTime.now();
+        String commitTimeString = commitTime.toString().substring(0, 19);
+        String[] commitTimeArray = commitTimeString.split(" ");
+        commitTimeString = commitTimeArray[0] + "$" + commitTimeArray[1] ;
+        String commitFolderName = "./.coffee/" + commitId + "--" + commitTimeString;
+
+        String file;
+        String fileId;
+        for(Map.Entry <String, String> entry : fileDiffs.entrySet())
+        {
+            file = (String) entry.getKey();
+            diff = (String) entry.getValue();
+            fileId = coffee.fileDB.getFileID(repositoryID, file);
+
+            File commitFolder = new File(commitFolderName);
+            if (!commitFolder.exists()) commitFolder.mkdir();
+
+            File commitFile = new File(commitFolderName + "/" + fileId + ".diff");
+            FileWriter fw = new FileWriter(commitFile);
+            fw.write(file + "\n\n");
+            fw.write(diff);
+
+            coffee.commitDB.createCommit(commitId, userID, repositoryID, commitTime, fileId, message);
+            coffee.fileDB.updateFileCommitTime(repositoryID, file, commitTime);
+            System.out.println("added changes: " + file);
+        }
+        System.out.println(numFilesModified + " file(s) modified: " + numDiffs.get("additions") + " additions(+) " + numDiffs.get("deletions") + " deletions(-)");
+    }
+
+    public void pull(Coffee coffee) throws SQLException, DbxException, ClassNotFoundException, IOException, InterruptedException
+    {
+        String userID = coffee.userID;
+        String repositoryID = coffee.repositoryID;
+        String repositoryName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
+
+        // A user can always pull changes, even if they are not a collaborator
+        // String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
+        // if (!(relation.equals("owner") || relation.equals("collaborator")))
+        // {
+        //     System.out.println("Error: You do not have pull acccess to this repository.");
+        //     return;
+        // }
+        
+        String ownerId = coffee.relDB.getRepositoryOwnerFromRepositoryId(repositoryID);
+        String ownerName = coffee.devDB.getUsernameFromUserId(ownerId);
+
+        String dropBoxPath = "/" + ownerName + "/" + repositoryName;
+        LocalDateTime dropBoxCommitTime = coffee.dropBox.getLastDropBoxCommitTime(dropBoxPath);
+        LocalDateTime localCommitTime = coffee.dropBox.getLastLocalCommitTime();
+
+        if (dropBoxCommitTime == null)
+        {
+            System.out.println("No commits have been pushed to repository.");
+            return;
+        }
+        else
+        {
+            if (localCommitTime != null)
+            {
+                if (localCommitTime.equals(dropBoxCommitTime))
+                {
+                    System.out.println("No changes to pull, repository is upto date.");
+                    return;
+                }
+                else if (localCommitTime.isAfter(dropBoxCommitTime))
+                {
+                    System.out.println("Error: You have local commits that are newer than the repository.");
+                    return;
+                }
+                else
+                {
+                    System.out.println("Pulling changes from repository...");
+                    coffee.dropBox.downloadFolder("./", dropBoxPath);
+                }
+            }
+            else
+            {
+                System.out.println("Pulling changes from repository...");
+                coffee.dropBox.downloadFolder("./", dropBoxPath);
+            }
+        }
+    }
+}

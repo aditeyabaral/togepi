@@ -93,7 +93,8 @@ class CommandRunner
     {
         Pattern createRepoPattern = Pattern.compile("cfe init ([A-Za-z0-9_]*)");
         Pattern addFilesPattern = Pattern.compile("cfe add (( *[A-Za-z0-9._]*)*)");
-        Pattern commitFilesPattern = Pattern.compile("cfe commit ([A-Za-z0-9_]*)");
+        Pattern commitFilesPattern = Pattern.compile("cfe commit");
+        Pattern pullFilesPattern = Pattern.compile("cfe pull");
         Pattern clonePattern = Pattern.compile("cfe clone ([A-Za-z0-9_]*/[A-Za-z0-9_]*)");
         Pattern addCollabPattern = Pattern.compile("cfe repo add collab ([A-Za-z0-9_]*)");
 
@@ -102,7 +103,8 @@ class CommandRunner
         // TODO: implement all
         commandsRepo.put(createRepoPattern, RepositoryUtilities.class.getMethod("init", Coffee.class, String.class));
         // commandsRepo.put(addFilesPattern, RepositoryDatabaseUtilities.class.getMethod("add", String.class));
-        // commandsRepo.put(commitFilesPattern, RepositoryDatabaseUtilities.class.getMethod("commit", String.class));
+        commandsRepo.put(commitFilesPattern, RepositoryUtilities.class.getMethod("commit", Coffee.class));
+        commandsRepo.put(pullFilesPattern, RepositoryUtilities.class.getMethod("pull", Coffee.class));
         // commandsRepo.put(clonePattern, RepositoryDatabaseUtilities.class.getMethod("clone", String.class));
         // commandsRepo.put(addCollabPattern, RepositoryDatabaseUtilities.class.getMethod("addCollabprator", String.class));
     }
@@ -157,9 +159,17 @@ class CommandRunner
         method = getRepositoryMethod(command);
         if (method != null)
         {
-            System.out.println(method);
+            // System.out.println(method);
             if (coffee.userID == null)
+            {
                 System.out.println("You are not logged in. Please login first.");
+                return;
+            }
+            else if (coffee.repositoryID == null && !(command.substring(0, 8).equals("cfe init")))
+            {
+                System.out.println("You are not inside a repository. Please enter a repository first.");
+                return;
+            }
             else
             {
                 String[] tempArgs = command.split(" ");
