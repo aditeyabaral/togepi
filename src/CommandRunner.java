@@ -95,7 +95,7 @@ class CommandRunner
         Pattern addFilesPattern = Pattern.compile("cfe add (( *[A-Za-z0-9._]*)*)");
         Pattern commitFilesPattern = Pattern.compile("cfe commit");
         Pattern pullFilesPattern = Pattern.compile("cfe pull");
-        Pattern clonePattern = Pattern.compile("cfe clone ([A-Za-z0-9_]*/[A-Za-z0-9_]*)");
+        Pattern clonePattern = Pattern.compile("cfe clone ([A-Za-z0-9_/]*)");
         Pattern addCollabPattern = Pattern.compile("cfe repo add collab ([A-Za-z0-9_]*)");
 
         commandsRepo = new HashMap<Pattern, Method>();
@@ -105,8 +105,8 @@ class CommandRunner
         // commandsRepo.put(addFilesPattern, RepositoryDatabaseUtilities.class.getMethod("add", String.class));
         commandsRepo.put(commitFilesPattern, RepositoryUtilities.class.getMethod("commit", Coffee.class));
         commandsRepo.put(pullFilesPattern, RepositoryUtilities.class.getMethod("pull", Coffee.class));
-        // commandsRepo.put(clonePattern, RepositoryDatabaseUtilities.class.getMethod("clone", String.class));
-        // commandsRepo.put(addCollabPattern, RepositoryDatabaseUtilities.class.getMethod("addCollabprator", String.class));
+        commandsRepo.put(clonePattern, RepositoryUtilities.class.getMethod("clone", Coffee.class, String.class));
+        commandsRepo.put(addCollabPattern, RepositoryUtilities.class.getMethod("addCollaborator", Coffee.class, String.class));
     }
 
     public Method getRepositoryMethod(String command) throws Exception
@@ -165,7 +165,7 @@ class CommandRunner
                 System.out.println("You are not logged in. Please login first.");
                 return;
             }
-            else if (coffee.repositoryID == null && !(command.substring(0, 8).equals("cfe init")))
+            else if (coffee.repositoryID == null && !(command.substring(0, 8).equals("cfe init")) && !(command.substring(0, 9).equals("cfe clone")))
             {
                 System.out.println("You are not inside a repository. Please enter a repository first.");
                 return;
@@ -175,7 +175,7 @@ class CommandRunner
                 String[] tempArgs = command.split(" ");
                 if (tempArgs.length > 1)
                 {
-                    String arg = tempArgs[2];
+                    String arg = tempArgs[tempArgs.length - 1];
                     method.invoke(coffee.repo, coffee, arg);
                 }
                 else
