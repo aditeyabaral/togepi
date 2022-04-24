@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGUSzCSoDb52VXkzF1Dhfjg4BuXKU-gZs7FeotUHSJ1bnaKmzbL4uY-_CjxQlA8nrlAUTS6SAyqdVPnRHBJT9aw7QAv7S3eCbCXV45WmUb7xhc84_nks9AYT4zSMxqq2GajYnwf9XPsI";
+        this.API_KEY = "sl.BGWJpYT3pE1K9ZlWDOW9BcK6dUd6QC_YnTa46vNeTRriPg_xmxhUEOmCM6WSWDn3otWw7QFRXxClPNxixeGftMh4DvwXS_MvqsxcZNMiAIWoHJwfEEArByzDJ7ddxf3L-SJq__3pDYeJ";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }

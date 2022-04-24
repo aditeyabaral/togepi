@@ -82,6 +82,17 @@ class RepositoryDatabaseUtilities extends DatabaseUtilities
         if (rs.next()) return rs.getString("name");
         else return null;
     }
+
+    public String getRepositoryIdFromUserIdRepositoryName(String userId, String repositoryName) throws SQLException
+    {
+        String query = "SELECT _id FROM " + tableName + " WHERE owner_id = ? AND name = ?";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, userId);
+        pstmt.setString(2, repositoryName);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) return rs.getString("_id");
+        else return null;
+    }
 }
 
 // class TestRepositoryDatabaseUtilities
