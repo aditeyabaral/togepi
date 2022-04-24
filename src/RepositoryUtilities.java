@@ -183,7 +183,7 @@ class RepositoryUtilities
     {
         try
         {
-            File file = new File(repoName + "/.coffee/.bean");
+            File file = new File(System.getProperty("user.dir") + "/" + repoName + "/.coffee/.bean");
             if (!file.exists()) file.createNewFile();
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             bw.write("repositoryId," + repoId); bw.newLine();
@@ -220,7 +220,7 @@ class RepositoryUtilities
             return;
         }
 
-        coffee.cmd.mkdir(repoName);
+        coffee.cmd.mkdir(repoName); // add check if exists
         coffee.cmd.mkdir(repoName + "/.coffee");
         String repoId = generateRepositoryID();
         

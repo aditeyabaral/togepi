@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGVwyok7AxwR_Q8F8m4hKbItyNVngKUQDKvLdmOhaAZe7n_zjJYCvXdJ71U7WiggonqM4-Hp6sx3bpV8-Llz0acwCeERgfBMNMfNrBClKDdwYDxpNzkJhOcS8LPnugkHhQkKQJRG7zqc";
+        this.API_KEY = "sl.BGUSzCSoDb52VXkzF1Dhfjg4BuXKU-gZs7FeotUHSJ1bnaKmzbL4uY-_CjxQlA8nrlAUTS6SAyqdVPnRHBJT9aw7QAv7S3eCbCXV45WmUb7xhc84_nks9AYT4zSMxqq2GajYnwf9XPsI";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -90,14 +90,15 @@ class DropBoxUtilities
     {
         if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
         ArrayList<String> fileList = new ArrayList<String>();
-        Files.find(Paths.get(localPath), 999, (p, bfa) -> true).forEach(path -> fileList.add(path.toString()));
-
+        Files.find(Paths.get(System.getProperty("user.dir") + "/" + localPath), 999, (p, bfa) -> true).forEach(path -> fileList.add(path.toString()));
+        // System.out.println(fileList);
         ArrayList<String> outputString = new ArrayList<String>();
         for (String file : fileList)
         {
             String fileName = "/" + file;
             fileName = Paths.get(fileName).normalize().toString();
-            fileName = dropboxPath + fileName;
+            int absPathLength = (System.getProperty("user.dir") + "/").length();
+            fileName = dropboxPath + "/" + fileName.substring(absPathLength);
             System.out.println("Uploading " + fileName);
             if (Files.isDirectory(Paths.get(file)))
             {
