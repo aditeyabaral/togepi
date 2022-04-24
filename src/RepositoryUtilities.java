@@ -409,13 +409,17 @@ class RepositoryUtilities
                 else
                 {
                     System.out.println("Pulling changes from repository...");
-                    coffee.dropBox.downloadFolder("/", dropBoxPath, true);
+                    coffee.cmd.cd("..");
+                    coffee.dropBox.downloadFolder("/", dropBoxPath);
+                    coffee.cmd.cd(repositoryName);
                 }
             }
             else
             {
                 System.out.println("Pulling changes from repository...");
-                coffee.dropBox.downloadFolder("/", dropBoxPath, true);
+                coffee.cmd.cd("..");
+                coffee.dropBox.downloadFolder("/", dropBoxPath);
+                coffee.cmd.cd(repositoryName);
             }
         }
     }
