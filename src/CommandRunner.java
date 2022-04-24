@@ -99,7 +99,7 @@ class CommandRunner
         commandsRepo = new HashMap<Pattern, Method>();
     
         commandsRepo.put(createRepoPattern, RepositoryUtilities.class.getMethod("init", Coffee.class, String.class));
-        commandsRepo.put(addFilesPattern, RepositoryUtilities.class.getMethod("add", Coffee.class, ArrayList.class));
+        commandsRepo.put(addFilesPattern, RepositoryUtilities.class.getMethod("add", Coffee.class, String.class));
         commandsRepo.put(clonePattern, RepositoryUtilities.class.getMethod("clone", Coffee.class, String.class));
         commandsRepo.put(addCollabPattern, RepositoryUtilities.class.getMethod("addCollaborator", Coffee.class, String.class));
     }

@@ -623,7 +623,7 @@ class RepositoryUtilities
                 line = line.trim();
                 if (!line.equals(""))
                 {
-                    ignoredFiles.addAll(line);
+                    ignoredFiles.addAll(getAllFiles(new File(line)));
                 }
             }
             br.close();
@@ -633,15 +633,19 @@ class RepositoryUtilities
         {
             for (int i = 0; i < fileList.size(); i++)
             {
-                if ((fileList.get(i).contains(ignoredFile)) || (fileList.get(i).startsWith("./.coffee/COMMIT")) || !(File(fileList.get(i)).exists()))
+                if ((fileList.get(i).contains(ignoredFile)) || (fileList.get(i).startsWith("./.coffee/COMMIT")))
                 {
-                    fileList.remove(i);
+                    File file = new File(fileList.get(i));
+                    if (file.exists())
+                    {
+                        fileList.remove(i);
+                    }
                 }
             }
         }
 
         ArrayList<String> newTrackedFiles = new ArrayList<String>();
-        for (String filePath: filePaths) {
+        for (String filePath: fileList) {
             
             if (!coffee.fileDB.checkFileInDatabase(repositoryID, filePath)) {
                 newTrackedFiles.add(filePath);
