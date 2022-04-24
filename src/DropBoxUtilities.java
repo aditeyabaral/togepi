@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGVOQk-4mAegEaXHD2BYxoy1jYgqTimDOnEbCXLm7fOq0rHi4VccVpPdHr4uvUc7bNCrMRaqeLzOSwAvX4lGqTxqziwcVCSIJ4xF1QgqXbM56cVuhnNWK14eHfUkw7VXjXRQqA2ZZ_NZ";
+        this.API_KEY = "sl.BGWa6AR8eUuOXFdzBOtdAV-14ve1keHORM-oAJuKDZPLOe1ca0Hbk6rr3Ntcr6W5Vo8coNbS5xH7rwkBNZlIBOq4bRNy-qnh1T9cpE78Zw27xPgkLUNykbDQ001kA-MtDufsqCSjyK9D";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -141,11 +141,13 @@ class DropBoxUtilities
         ArrayList<LocalDateTime> commitTimes = new ArrayList<LocalDateTime>();
         for (String file : fileList)
         {
+            System.out.println(file);
             fileName = file.substring(dropboxPath.length() + 1);
             if (fileName.equals(".bean")) continue;
-            String[] fileNameSplit = fileName.split("$");
+            String[] fileNameSplit = fileName.split("--");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
-            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
+            System.out.println(timestamp);
+            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd't'HH:mm:ss"));
             commitTimes.add(localDateTime);
         }
         commitTimes.sort(Comparator.naturalOrder());
@@ -157,15 +159,16 @@ class DropBoxUtilities
     public LocalDateTime getLastLocalCommitTime() throws DbxException, ClassNotFoundException, IOException
     {
         ArrayList<LocalDateTime> commitTimes = new ArrayList<LocalDateTime>();
-        File commitDirectory = new File(".coffee");
+        File commitDirectory = new File(System.getProperty("user.dir") + "/.coffee");
         String fileName, timestamp;
         for (File file : commitDirectory.listFiles())
         {
             fileName = file.getName();
+            System.out.println(fileName);
             if (fileName.equals(".bean")) continue;
-            String[] fileNameSplit = fileName.split("$");
+            String[] fileNameSplit = fileName.split("--");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
-            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("%Y-%m-%d---%H:%M:%S"));
+            LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
             commitTimes.add(localDateTime);
         }
         commitTimes.sort(Comparator.naturalOrder());
@@ -184,6 +187,7 @@ class DropBoxUtilities
             // Change to the parent directory
             absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf("/"));
         }
+        System.out.println(absolutePath);
 
         localPath = absolutePath + "CLONE.zip";
         localPath = Paths.get(localPath).normalize().toString();

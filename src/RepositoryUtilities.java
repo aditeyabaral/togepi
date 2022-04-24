@@ -518,7 +518,7 @@ class RepositoryUtilities
             System.out.println(userID + " " + repositoryID);
             String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
             System.out.println(relation);
-            if (relation == null || !(relation.equals("owner") || !(relation.equals("collaborator"))))
+            if (relation == null || (!(relation.equals("owner")) && !(relation.equals("collaborator"))))
             {
                 System.out.println("Error: You do not have acccess to this repository.");
                 return;
