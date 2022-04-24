@@ -167,9 +167,18 @@ class DropBoxUtilities
         return commitTimes.get(commitTimes.size() - 1);
     }
 
-    public void downloadFolder(String localPath, String dropboxPath) throws DbxException, ClassNotFoundException, IOException, InterruptedException
+    
+    public void downloadFolder(String localPath, String dropboxPath, boolean pull) throws DbxException, ClassNotFoundException, IOException, InterruptedException
     {
-        localPath = System.getProperty("user.dir") + localPath + "CLONE.zip";
+
+        String absolutePath = System.getProperty("user.dir") + localPath;
+        if (pull == true) 
+        {
+            // Change to the parent directory
+            absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf("/"));
+        }
+
+        localPath = absolutePath + "CLONE.zip";
         localPath = Paths.get(localPath).normalize().toString();
         if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
         FileOutputStream downloadedFolder = new FileOutputStream(localPath);
@@ -180,4 +189,10 @@ class DropBoxUtilities
         File f = new File(localPath);
         f.delete();
     }
+
+    public void downloadFolder(String localPath, String dropboxPath) throws DbxException, ClassNotFoundException, IOException, InterruptedException
+    {
+        downloadFolder(localPath, dropboxPath, false);
+    }
+
 }

@@ -147,7 +147,17 @@ class CommandLineUtilities
 
     // public void nano(String filename);
 
-    // public void help();
+    public void help() {
+        // TODO: add cfe commands
+        System.out.println("ls: list files and folders");
+        System.out.println("cat: display file contents");
+        System.out.println("mkdir: create a new folder");
+        System.out.println("rm: delete a file");
+        System.out.println("rmdir: delete a folder");
+        System.out.println("cd: change current directory");
+        System.out.println("clear: clear the screen");
+        System.out.println("help: display this message");
+    }
 
     public void coffee()
     {

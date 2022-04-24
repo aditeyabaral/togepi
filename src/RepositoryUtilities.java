@@ -406,13 +406,13 @@ class RepositoryUtilities
                 else
                 {
                     System.out.println("Pulling changes from repository...");
-                    coffee.dropBox.downloadFolder("/", dropBoxPath);
+                    coffee.dropBox.downloadFolder("/", dropBoxPath, true);
                 }
             }
             else
             {
                 System.out.println("Pulling changes from repository...");
-                coffee.dropBox.downloadFolder("/", dropBoxPath);
+                coffee.dropBox.downloadFolder("/", dropBoxPath, true);
             }
         }
     }
@@ -558,5 +558,103 @@ class RepositoryUtilities
 
         coffee.relDB.createUserRepositoryRelation(collaboratorID, repositoryID, "collaborator");
         System.out.println("User " + collaboratorName + " added as a collaborator.");
+    }
+
+    private ArrayList<String> getAllFiles(File curDir) {
+        ArrayList<String> files = new ArrayList<String>();
+
+        // Get all working dir files and folders
+        File[] filesList = curDir.listFiles();
+
+        for(File f : filesList){
+
+            if (f.isDirectory()) {
+                ArrayList<String> subFiles = getAllFiles(f);
+                files.addAll(subFiles);
+            }
+
+            else if (f.isFile()){
+                files.add(f.getPath());
+            }
+        }
+        return files;
+    }
+
+    public void add(Coffee coffee, String filePaths) throws IOException, SQLException
+    {
+        String userID = coffee.userID;
+        String repositoryID = coffee.repositoryID;
+        String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
+        if (!(relation.equals("owner") || relation.equals("collaborator")))
+        {
+            System.out.println("Error: You do not have acccess to this repository.");
+            return;
+        }
+
+        ArrayList<String> fileList = new ArrayList<String>();
+        if(filePaths.equals("."))
+        {
+            fileList = getAllFiles(new File("."));
+        }
+        else
+        {
+            String[] filePathsArray = filePaths.split(" ");
+            for (String filePath: filePathsArray)
+            {
+                fileList.addAll(getAllFiles(new File(filePath)));
+            }
+        }
+
+        System.out.println(fileList);
+        if (fileList.size() == 0)
+        {
+            System.out.println("Error: No files specified.");
+            return;
+        }
+
+        ArrayList<String> ignoredFiles = new ArrayList<String>();
+        File ignoreFile = new File(".cfeignore");
+        if (ignoreFile.exists())
+        {
+            BufferedReader br = new BufferedReader(new FileReader(ignoreFile));
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+                line = line.trim();
+                if (!line.equals(""))
+                {
+                    ignoredFiles.addAll(line);
+                }
+            }
+            br.close();
+        }
+
+        for (String ignoredFile: ignoredFiles)
+        {
+            for (int i = 0; i < fileList.size(); i++)
+            {
+                if ((fileList.get(i).contains(ignoredFile)) || (fileList.get(i).startsWith("./.coffee/COMMIT")) || !(File(fileList.get(i)).exists()))
+                {
+                    fileList.remove(i);
+                }
+            }
+        }
+
+        ArrayList<String> newTrackedFiles = new ArrayList<String>();
+        for (String filePath: filePaths) {
+            
+            if (!coffee.fileDB.checkFileInDatabase(repositoryID, filePath)) {
+                newTrackedFiles.add(filePath);
+            }
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        ArrayList<String> outputs = new ArrayList<String>();
+        for (String trackedFile: newTrackedFiles)
+        {
+            String fileID = generateFileID();
+            coffee.fileDB.createFile(fileID, trackedFile, repositoryID, "unchanged", now, null, null);
+            System.out.println("Added " + trackedFile + " to the repository.");
+        }
     }
 }

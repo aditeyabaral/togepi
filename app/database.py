@@ -2,18 +2,19 @@ import os
 import dotenv
 from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
+from eralchemy import render_er
 
 dotenv.load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://kphftpinxhfrbj:c2d60d0b6766191a629bc71e6e60bb36090ca28361052e1902bc9e78c2b53c48@ec2-54-83-82-187.compute-1.amazonaws.com:5432/d3au8v0r6o7dut"
+app.config['SQLALCHEMY_DATABASE_URI'] = ""
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
 class Developer(db.Model):
     __tablename__ = "developer"
-    _id = db.Column(db.String(50), primary_key=True)
+    _id = db.Column(db.String(26), primary_key=True)
     username = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
@@ -27,7 +28,7 @@ class Developer(db.Model):
 
 class Repository(db.Model):
     __tablename__ = "repository"
-    _id = db.Column(db.String(50), primary_key=True)
+    _id = db.Column(db.String(26), primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(150))
     url = db.Column(db.String(1024), nullable=False)
@@ -49,9 +50,9 @@ class Repository(db.Model):
 
 class OwnerRepositoryRelation(db.Model):
     __tablename__ = "repositoryuserelation"
-    developer_id = db.Column(db.String(50), db.ForeignKey(
+    developer_id = db.Column(db.String(26), db.ForeignKey(
         'developer._id'), primary_key=True)  # Check cascade
-    repository_id = db.Column(db.String(50), db.ForeignKey(
+    repository_id = db.Column(db.String(26), db.ForeignKey(
         'repository._id', ondelete='CASCADE'), primary_key=True)
     relation = db.Column(db.String(20), nullable=False)
     # user_relation = db.relationship("user", back_populates="repositoryuserelation")
@@ -65,9 +66,9 @@ class OwnerRepositoryRelation(db.Model):
 
 class File(db.Model):
     __tablename__ = "file"
-    _id = db.Column(db.String(50), primary_key=True)
+    _id = db.Column(db.String(26), primary_key=True)
     path = db.Column(db.String(100), nullable=False)
-    repository_id = db.Column(db.String(50), db.ForeignKey(
+    repository_id = db.Column(db.String(26), db.ForeignKey(
         'repository._id', ondelete='CASCADE'), nullable=False)
     status = db.Column(db.String(15), nullable=False)
     last_modified = db.Column(db.DateTime)
@@ -86,14 +87,14 @@ class File(db.Model):
 
 class Commit(db.Model):
     __tablename__ = "commit"
-    _id = db.Column(db.String(50), primary_key=True)
-    developer_id = db.Column(db.String(50), db.ForeignKey(
+    _id = db.Column(db.String(26), primary_key=True)
+    developer_id = db.Column(db.String(26), db.ForeignKey(
         'developer._id', ondelete='CASCADE'))
-    repository_id = db.Column(db.String(50), db.ForeignKey(
+    repository_id = db.Column(db.String(26), db.ForeignKey(
         'repository._id', ondelete='CASCADE'), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
     message = db.Column(db.String(100))
-    file_id = db.Column(db.String(50), db.ForeignKey(
+    file_id = db.Column(db.String(26), db.ForeignKey(
         'file._id', ondelete='CASCADE'), primary_key=True)
 
     def __init__(self, _id, developer_id, repository_id, time, file_id, message=None) -> None:
@@ -111,4 +112,6 @@ def home():
 
 
 if __name__ == "__main__":
+    render_er(db.Model, 'model_erd.png')
+
     app.run()

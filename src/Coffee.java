@@ -54,6 +54,8 @@ class Coffee
         Boolean debug = args.length > 0 && args[0].equals("--debug");
         if (debug) System.out.println("Running in debug mode");
         System.out.println("Welcome to Coffee!");
+        System.out.println("Type 'help' for a list of commands");
+        System.out.println("Type 'quit' to quit Coffee");
 
         coffeeInstance.runner.initCommandMaps();
         coffeeInstance.commitDB.connect();
