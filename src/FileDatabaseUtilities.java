@@ -67,7 +67,12 @@ public class FileDatabaseUtilities extends DatabaseUtilities {
             pstmt.setString(1, repoID);
             pstmt.setString(2, fileName);
             ResultSet rs = pstmt.executeQuery();
-            return rs.getString("_id");
+            if(rs.next()) {
+                return rs.getString("_id");
+            }
+            else {
+                return null;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -109,7 +114,7 @@ public class FileDatabaseUtilities extends DatabaseUtilities {
     }
 
     public void updateFileCommitTime(String repoID, String path, LocalDateTime lastCommitTime) {
-        String query = "UPDATE " + fileTableName + " SET last_commited = ? WHERE repository_id = ? AND path = ?";
+        String query = "UPDATE " + fileTableName + " SET last_committed = ? WHERE repository_id = ? AND path = ?";
         PreparedStatement pstmt;
         try {
             pstmt = conn.prepareStatement(query);
@@ -136,12 +141,12 @@ public class FileDatabaseUtilities extends DatabaseUtilities {
             e.printStackTrace();
         }
 
-        String query2 = "UPDATE " + fileTableName + " SET status = \"unchanged\" WHERE repository_id = ? AND path = ?";
+        String query2 = "UPDATE " + fileTableName + " SET status = 'unchanged' WHERE repository_id = ? AND path = ?";
         PreparedStatement pstmt2;
         try {
             pstmt2 = conn.prepareStatement(query2);
             pstmt2.setString(1, repoID);
-            pstmt2.setString(1, path);
+            pstmt2.setString(2, path);
             pstmt2.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

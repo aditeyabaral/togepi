@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGWJpYT3pE1K9ZlWDOW9BcK6dUd6QC_YnTa46vNeTRriPg_xmxhUEOmCM6WSWDn3otWw7QFRXxClPNxixeGftMh4DvwXS_MvqsxcZNMiAIWoHJwfEEArByzDJ7ddxf3L-SJq__3pDYeJ";
+        this.API_KEY = "sl.BGVOQk-4mAegEaXHD2BYxoy1jYgqTimDOnEbCXLm7fOq0rHi4VccVpPdHr4uvUc7bNCrMRaqeLzOSwAvX4lGqTxqziwcVCSIJ4xF1QgqXbM56cVuhnNWK14eHfUkw7VXjXRQqA2ZZ_NZ";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -40,6 +40,7 @@ class DropBoxUtilities
 
     public String getFileContent(String dropboxPath) throws DbxException, ClassNotFoundException, IOException
     {
+        System.out.println("DropBox path " + dropboxPath);
         if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
         StringBuilder sb = new StringBuilder();
         try (InputStream in = client.files().download(dropboxPath).getInputStream()) 
@@ -51,6 +52,10 @@ class DropBoxUtilities
                 sb.append(line);
                 sb.append("\n");
             }
+        }
+        catch (Exception e)
+        {
+            return "";
         }
         return sb.toString();
     }
@@ -98,6 +103,7 @@ class DropBoxUtilities
             String fileName = "/" + file;
             fileName = Paths.get(fileName).normalize().toString();
             int absPathLength = (System.getProperty("user.dir") + "/").length();
+            // System.out.println(fileName);
             fileName = dropboxPath + "/" + fileName.substring(absPathLength);
             System.out.println("Uploading " + fileName);
             if (Files.isDirectory(Paths.get(file)))

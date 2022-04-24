@@ -309,7 +309,7 @@ class RepositoryUtilities
         String diff;
         for(String file : trackedFiles)
         {
-            fileObject = new File(file);
+            fileObject = new File(System.getProperty("user.dir") + "/" + file);
             br = new BufferedReader(new FileReader(fileObject));
             String fileContent = "";
             String line;
@@ -317,6 +317,7 @@ class RepositoryUtilities
             br.close();
 
             cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + file;
+            System.out.println("Cloud file path " + cloudFilePath);
             cloudFileContent = coffee.dropBox.getFileContent(cloudFilePath);
             diff = getDiffBetweenFileContents(fileContent, cloudFileContent);
             HashMap<String, Integer> diffMap = checkFileIsModified(diff);
@@ -336,9 +337,10 @@ class RepositoryUtilities
         String commitId = generateCommitID();
         LocalDateTime commitTime = LocalDateTime.now();
         String commitTimeString = commitTime.toString().substring(0, 19);
-        String[] commitTimeArray = commitTimeString.split(" ");
-        commitTimeString = commitTimeArray[0] + "$" + commitTimeArray[1] ;
-        String commitFolderName = "./.coffee/" + commitId + "--" + commitTimeString;
+        System.out.println("Commit time: " + commitTimeString);
+        // String[] commitTimeArray = commitTimeString.split(" ");
+        // commitTimeString = commitTimeArray[0] + "$" + commitTimeArray[1] ;
+        String commitFolderName = System.getProperty("user.dir") + "/" + ".coffee/" + commitId + "--" + commitTimeString;
 
         String file;
         String fileId;
@@ -346,6 +348,7 @@ class RepositoryUtilities
         {
             file = (String) entry.getKey();
             diff = (String) entry.getValue();
+            System.out.println(file);
             fileId = coffee.fileDB.getFileID(repositoryID, file);
 
             File commitFolder = new File(commitFolderName);
@@ -434,7 +437,7 @@ class RepositoryUtilities
         String ownerId = coffee.relDB.getRepositoryOwnerFromRepositoryId(repositoryID);
         String ownerName = coffee.devDB.getUsernameFromUserId(ownerId);
 
-        String dropBoxPath = "/" + ownerName + "/" + repositoryName;
+        String dropBoxPath = "/" + ownerName;
         LocalDateTime now = LocalDateTime.now(); 
 
         ArrayList<String> trackedFiles = coffee.fileDB.getTrackedFiles(repositoryID);
@@ -444,7 +447,9 @@ class RepositoryUtilities
             coffee.fileDB.updateFilePushTime(repositoryID, filePath, now);
         }
 
-        ArrayList<String> outputString = coffee.dropBox.uploadFolder("../" + repositoryName, dropBoxPath);
+        coffee.cmd.cd("../");
+        ArrayList<String> outputString = coffee.dropBox.uploadFolder(repositoryName, dropBoxPath);
+        coffee.cmd.cd(repositoryName);
     }
 
 
@@ -469,7 +474,7 @@ class RepositoryUtilities
         for (String filePath: trackedFiles)
         {
             try {
-                String cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + filePath.subSequence(2, filePath.length());
+                String cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + filePath;
                 String cloudContent = coffee.dropBox.getFileContent(cloudFilePath);
 
                 // Find diff
@@ -637,21 +642,38 @@ class RepositoryUtilities
         {
             for (int i = 0; i < fileList.size(); i++)
             {
-                if ((fileList.get(i).contains(ignoredFile)) || (fileList.get(i).startsWith("./.coffee/COMMIT")))
+                if ((fileList.get(i).contains(ignoredFile)))
                 {
                     File file = new File(fileList.get(i));
                     if (file.exists())
                     {
+                        System.out.println("Removing " + file.getPath() + "...");
                         fileList.remove(i);
                     }
                 }
             }
         }
 
+        ArrayList<String> filteredFiles = new ArrayList<String>();
+        for(String file: fileList)
+        {
+            if (!(file.startsWith(System.getProperty("user.dir") + "/" + ".coffee")))
+            {
+                filteredFiles.add(file);
+            }
+        }
+
+        String repoName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
+        // System.out.println(System.getProperty("user.dir") + "/" + repoName + "/");
+        int currentDirLength = (System.getProperty("user.dir") + "/").length();
         ArrayList<String> newTrackedFiles = new ArrayList<String>();
-        for (String filePath: fileList) {
-            
-            if (!coffee.fileDB.checkFileInDatabase(repositoryID, filePath)) {
+        for (String filePath: filteredFiles)
+        {
+            filePath = filePath.substring(currentDirLength);
+            if (!coffee.fileDB.checkFileInDatabase(repositoryID, filePath))
+            {
+                // filePath = filePath.substring(currentDirLength);
+                System.out.println(filePath + " not in db");
                 newTrackedFiles.add(filePath);
             }
         }

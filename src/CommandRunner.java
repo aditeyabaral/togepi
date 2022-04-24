@@ -168,9 +168,10 @@ class CommandRunner
             else
             {
                 String[] tempArgs = command.split(" ");
-                if (tempArgs.length > 1)
+                if (tempArgs.length > 2)
                 {
                     String arg = tempArgs[tempArgs.length - 1];
+                    System.out.println(arg);
                     method.invoke(coffee.repo, coffee, arg);
                 }
                 else
