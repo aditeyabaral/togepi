@@ -70,7 +70,15 @@ class Coffee
             System.out.print(">>> ");
             command = sc.nextLine().strip();
 
-            if (command.equals("exit") || command.equals("quit")) System.exit(0);
+            if (command.equals("exit") || command.equals("quit"))
+            {
+                coffeeInstance.commitDB.conn.close();
+                coffeeInstance.devDB.conn.close();
+                coffeeInstance.relDB.conn.close();
+                coffeeInstance.fileDB.conn.close();
+                coffeeInstance.repoDB.conn.close();
+                System.exit(0);
+            }
             else
             {
                 try { coffeeInstance.runner.run(coffeeInstance, command); }
