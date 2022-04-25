@@ -45,7 +45,6 @@ class CommandRunner
         Pattern cdPattern = Pattern.compile("cd ([\\.A-Za-z0-9\\/_]+)");
         Pattern lsPattern = Pattern.compile("ls ([\\.A-Za-z0-9\\/_]*)");
         Pattern catPattern = Pattern.compile("cat ([\\.A-Za-z0-9\\/_]+)");
-        // Pattern nanoPattern = Pattern.compile("cd ([\.A-Za-z0-9\\/_]+)");
         Pattern mkdirPattern = Pattern.compile("mkdir ([\\.A-Za-z0-9\\/_]+)");
         Pattern rmdirPattern = Pattern.compile("rmdir ([\\.A-Za-z0-9\\/_]+)");
         Pattern rmPattern = Pattern.compile("rm ([\\.A-Za-z0-9\\/_]+)");
@@ -54,7 +53,6 @@ class CommandRunner
         commandsCLI.put(cdPattern, CommandLineUtilities.class.getMethod("cd", String.class));
         commandsCLI.put(lsPattern, CommandLineUtilities.class.getMethod("ls", String.class));
         commandsCLI.put(catPattern, CommandLineUtilities.class.getMethod("cat", String.class));
-        // commandsCLI.put(nanoPattern, CommandLineUtilities.class.getMethod("nano", String.class));
         commandsCLI.put(mkdirPattern, CommandLineUtilities.class.getMethod("mkdir", String.class));
         commandsCLI.put(rmdirPattern, CommandLineUtilities.class.getMethod("rmdir", String.class));
         commandsCLI.put(rmPattern, CommandLineUtilities.class.getMethod("rm", String.class));
@@ -130,7 +128,6 @@ class CommandRunner
         method = getCLIMethod(command);
         if (method != null)
         {
-            // System.out.println(method);
             String[] tempArgs = command.split(" ");
             if (tempArgs.length > 1)
             {
@@ -146,7 +143,6 @@ class CommandRunner
         method = getDeveloperMethod(command);
         if (method != null)
         {
-            // System.out.println(method);
             method.invoke(coffee.dev, coffee);
             return;
         }
@@ -154,7 +150,6 @@ class CommandRunner
         method = getRepositoryMethod(command);
         if (method != null)
         {
-            // System.out.println(method);
             if (coffee.userID == null)
             {
                 System.out.println("You are not logged in. Please login first.");
@@ -171,7 +166,6 @@ class CommandRunner
                 if (tempArgs.length > 2)
                 {
                     String arg = tempArgs[tempArgs.length - 1];
-                    System.out.println(arg);
                     method.invoke(coffee.repo, coffee, arg);
                 }
                 else

@@ -19,7 +19,7 @@ class DropBoxUtilities
 
     public DropBoxUtilities()
     {
-        this.API_KEY = "sl.BGWOLVFWNzgwTJU71HWkvE-4TscYtupG0rJX1TSI7A8_RcuLCXWfZTcqbt10_KLwWZ6IXYFDJ3YITO-_XaSlhBSoAr8Z_T3MJ9daF_hlceB2GfjN7Z1B7f-QOgcSlYZpHQiW6SKyjncn";
+        this.API_KEY = "sl.BGYOziDdTT-ImIw5n9q8eyxw7_LzfVrzzlMeOm5ctH5D8Yfi1QyM5FxYtTo6Sf_68hWpFjorDDAF9dyj8wyv5pnpAPfYl0LD0MMnCT23VoQoML6il5lFVMyDWEns80yJEGbUJQBs11PV";
         this.config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         this.client = new DbxClientV2(config, API_KEY);
     }
@@ -40,7 +40,6 @@ class DropBoxUtilities
 
     public String getFileContent(String dropboxPath) throws DbxException, ClassNotFoundException, IOException
     {
-        System.out.println("DropBox path " + dropboxPath);
         if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
         StringBuilder sb = new StringBuilder();
         try (InputStream in = client.files().download(dropboxPath).getInputStream()) 
@@ -96,16 +95,17 @@ class DropBoxUtilities
         if (dropboxPath.charAt(0) != '/') dropboxPath = "/" + dropboxPath;
         ArrayList<String> fileList = new ArrayList<String>();
         Files.find(Paths.get(System.getProperty("user.dir") + "/" + localPath), 999, (p, bfa) -> true).forEach(path -> fileList.add(path.toString()));
-        // System.out.println(fileList);
         ArrayList<String> outputString = new ArrayList<String>();
         for (String file : fileList)
         {
             String fileName = "/" + file;
             fileName = Paths.get(fileName).normalize().toString();
             int absPathLength = (System.getProperty("user.dir") + "/").length();
-            // System.out.println(fileName);
             fileName = dropboxPath + "/" + fileName.substring(absPathLength);
-            System.out.println("Uploading " + fileName);
+            
+            if (!fileName.contains(".coffee"))
+                System.out.println("Uploading " + fileName);
+            
             if (Files.isDirectory(Paths.get(file)))
             {
                 try
@@ -114,7 +114,6 @@ class DropBoxUtilities
                 }
                 catch (DbxException e)
                 {
-                    // System.out.println("Folder already exists");
                     ;
                 }
             }
@@ -141,12 +140,10 @@ class DropBoxUtilities
         ArrayList<LocalDateTime> commitTimes = new ArrayList<LocalDateTime>();
         for (String file : fileList)
         {
-            System.out.println(file);
             fileName = file.substring(dropboxPath.length() + 1);
             if (fileName.equals(".bean")) continue;
             String[] fileNameSplit = fileName.split("--");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
-            System.out.println(timestamp);
             LocalDateTime localDateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd't'HH:mm:ss"));
             commitTimes.add(localDateTime);
         }
@@ -164,7 +161,6 @@ class DropBoxUtilities
         for (File file : commitDirectory.listFiles())
         {
             fileName = file.getName();
-            System.out.println(fileName);
             if (fileName.equals(".bean")) continue;
             String[] fileNameSplit = fileName.split("--");
             timestamp = fileNameSplit[fileNameSplit.length - 1];
@@ -184,10 +180,8 @@ class DropBoxUtilities
         String absolutePath = System.getProperty("user.dir") + localPath;
         if (pull == true) 
         {
-            // Change to the parent directory
             absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf("/"));
         }
-        System.out.println(absolutePath);
 
         localPath = absolutePath + "CLONE.zip";
         localPath = Paths.get(localPath).normalize().toString();

@@ -135,7 +135,7 @@ class RepositoryUtilities
     public HashMap checkFileIsModified(String diff)
     {
         HashMap<String, Integer> diffMap = new HashMap<String, Integer>();
-        if (diff.length() < 0)
+        if (diff.length() <= 0)
         {
             diffMap.put("modified", 0);
             return diffMap;
@@ -310,16 +310,22 @@ class RepositoryUtilities
         for(String file : trackedFiles)
         {
             fileObject = new File(System.getProperty("user.dir") + "/" + file);
-            br = new BufferedReader(new FileReader(fileObject));
             String fileContent = "";
-            String line;
-            while((line = br.readLine()) != null) fileContent += line + "\n";
-            br.close();
+            try
+            {
+                br = new BufferedReader(new FileReader(fileObject));
+                String line;
+                while((line = br.readLine()) != null) fileContent += line + "\n";
+                br.close();
+            }
+            catch (Exception e)
+            {
+                ;
+            }
 
             cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + file;
-            System.out.println("Cloud file path " + cloudFilePath);
             cloudFileContent = coffee.dropBox.getFileContent(cloudFilePath);
-            diff = getDiffBetweenFileContents(fileContent, cloudFileContent);
+            diff = getDiffBetweenFileContents(cloudFileContent, fileContent);
             HashMap<String, Integer> diffMap = checkFileIsModified(diff);
 
             if (diffMap.get("modified") > 0)
@@ -337,9 +343,6 @@ class RepositoryUtilities
         String commitId = generateCommitID();
         LocalDateTime commitTime = LocalDateTime.now();
         String commitTimeString = commitTime.toString().substring(0, 19);
-        System.out.println("Commit time: " + commitTimeString);
-        // String[] commitTimeArray = commitTimeString.split(" ");
-        // commitTimeString = commitTimeArray[0] + "$" + commitTimeArray[1] ;
         String commitFolderName = System.getProperty("user.dir") + "/" + ".coffee/" + commitId + "--" + commitTimeString;
 
         String file;
@@ -348,7 +351,6 @@ class RepositoryUtilities
         {
             file = (String) entry.getKey();
             diff = (String) entry.getValue();
-            System.out.println(file);
             fileId = coffee.fileDB.getFileID(repositoryID, file);
 
             File commitFolder = new File(commitFolderName);
@@ -371,14 +373,6 @@ class RepositoryUtilities
         String userID = coffee.userID;
         String repositoryID = coffee.repositoryID;
         String repositoryName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
-
-        // A user can always pull changes, even if they are not a collaborator
-        // String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
-        // if (!(relation.equals("owner") || relation.equals("collaborator")))
-        // {
-        //     System.out.println("Error: You do not have pull acccess to this repository.");
-        //     return;
-        // }
         
         String ownerId = coffee.relDB.getRepositoryOwnerFromRepositoryId(repositoryID);
         String ownerName = coffee.devDB.getUsernameFromUserId(ownerId);
@@ -430,7 +424,6 @@ class RepositoryUtilities
         String repositoryName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
         String userID = coffee.userID;
 
-        // A user must be a collaborator to push
         String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
         if (!(relation.equals("owner") || relation.equals("collaborator")))
         {
@@ -457,7 +450,8 @@ class RepositoryUtilities
     }
 
 
-    public void status(Coffee coffee) throws SQLException, FileNotFoundException {
+    public void status(Coffee coffee) throws SQLException, FileNotFoundException, IOException
+    {
         String repositoryID = coffee.repositoryID;
         String repositoryName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
         String userID = coffee.userID;
@@ -467,7 +461,6 @@ class RepositoryUtilities
 
         ArrayList<String> trackedFiles = coffee.fileDB.getTrackedFiles(repositoryID);
 
-        // A user must be a collaborator to view
         String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
         if (!(relation.equals("owner") || relation.equals("collaborator")))
         {
@@ -477,33 +470,35 @@ class RepositoryUtilities
 
         for (String filePath: trackedFiles)
         {
-            try {
+            String cloudContent = "";
+            try
+            {
                 String cloudFilePath = "/" + ownerName + "/" + repositoryName + "/" + filePath;
-                String cloudContent = coffee.dropBox.getFileContent(cloudFilePath);
-
-                // Find diff
-                String id = Generators.timeBasedGenerator().generate().toString();
-                String tempFileString = id+".txt";
-                BufferedWriter bw = new BufferedWriter(new FileWriter(tempFileString));
-                bw.write(cloudContent);
-                bw.close();
-
-                String diff = getDiffBetweenFiles(tempFileString, filePath);
-                File tempFile = new File(tempFileString);
-                tempFile.delete();
-                
-                if (checkFileIsModified(diff).get("modified") == (Integer) 1) {
-                    File file = new File(filePath);
-                    long lastModified = file.lastModified();
-                    LocalDateTime lastModifiedTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastModified), ZoneId.systemDefault());
-                    coffee.fileDB.updateFileModifiedTime(repositoryID, filePath, lastModifiedTime);
-                    System.out.println("modified: " + filePath);
-                }
+                cloudContent = coffee.dropBox.getFileContent(cloudFilePath);
             }
-            catch (Exception e) {
-                continue;
+            catch (Exception e)
+            {
+                cloudContent = "";
             }
+
+            String id = Generators.timeBasedGenerator().generate().toString();
+            String tempFileString = id+".txt";
+            BufferedWriter bw = new BufferedWriter(new FileWriter(tempFileString));
+            bw.write(cloudContent.trim());
+            bw.close();
+
+            String diff = getDiffBetweenFiles(tempFileString, System.getProperty("user.dir") + "/" + filePath);
+            File tempFile = new File(tempFileString);
+            tempFile.delete();
             
+            if (checkFileIsModified(diff).get("modified") == (Integer) 1)
+            {
+                File file = new File(filePath);
+                long lastModified = file.lastModified();
+                LocalDateTime lastModifiedTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastModified), ZoneId.systemDefault());
+                coffee.fileDB.updateFileModifiedTime(repositoryID, filePath, lastModifiedTime);
+                System.out.println("modified: " + filePath);
+            }
         }
     }
 
@@ -519,9 +514,7 @@ class RepositoryUtilities
         if(!(visibility.equals("public")))
         {
             String userID = coffee.userID;
-            System.out.println(userID + " " + repositoryID);
             String relation = coffee.relDB.getUserRepositoryRelation(userID, repositoryID);
-            System.out.println(relation);
             if (relation == null || (!(relation.equals("owner")) && !(relation.equals("collaborator"))))
             {
                 System.out.println("Error: You do not have acccess to this repository.");
@@ -618,7 +611,6 @@ class RepositoryUtilities
             }
         }
 
-        System.out.println(fileList);
         if (fileList.size() == 0)
         {
             System.out.println("Error: No files specified.");
@@ -636,7 +628,7 @@ class RepositoryUtilities
                 line = line.trim();
                 if (!line.equals(""))
                 {
-                    ignoredFiles.addAll(getAllFiles(new File(line)));
+                    ignoredFiles.addAll(getAllFiles(new File(System.getProperty("user.dir") + "/" + line)));
                 }
             }
             br.close();
@@ -668,7 +660,6 @@ class RepositoryUtilities
         }
 
         String repoName = coffee.repoDB.getRepositoryNameFromId(repositoryID);
-        // System.out.println(System.getProperty("user.dir") + "/" + repoName + "/");
         int currentDirLength = (System.getProperty("user.dir") + "/").length();
         ArrayList<String> newTrackedFiles = new ArrayList<String>();
         for (String filePath: filteredFiles)
@@ -676,8 +667,6 @@ class RepositoryUtilities
             filePath = filePath.substring(currentDirLength);
             if (!coffee.fileDB.checkFileInDatabase(repositoryID, filePath))
             {
-                // filePath = filePath.substring(currentDirLength);
-                System.out.println(filePath + " not in db");
                 newTrackedFiles.add(filePath);
             }
         }
@@ -688,7 +677,7 @@ class RepositoryUtilities
         {
             String fileID = generateFileID();
             coffee.fileDB.createFile(fileID, trackedFile, repositoryID, "unchanged", now, null, null);
-            System.out.println("Added " + trackedFile + " to the repository.");
+            System.out.println("added " + trackedFile + " to the repository.");
         }
     }
 }

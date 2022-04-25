@@ -55,14 +55,23 @@ class DeveloperUtilities
         // look for errors, rollback commit if dropbox job fails
         Scanner sc = new Scanner(System.in);
 
-        String emailAddress;
-        while (true)
+        String emailAddress = null;
+
+        // Attempts
+        int attempts = 0;
+        while (attempts < 3)
         {
             System.out.print("Enter your email address: ");
             emailAddress = sc.nextLine().strip();
             if (coffee.devDB.validateEmailAddress(emailAddress)) break;
+            attempts++;
         }
 
+        if (attempts == 3)
+        {
+            System.out.println("You have reached the maximum number of attempts. Please try registering again.");
+            return;
+        }
         String username;
         while (true)
         {

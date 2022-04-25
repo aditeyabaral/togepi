@@ -7,7 +7,11 @@ import java.util.regex.*;
 
 class DeveloperDatabaseUtilities extends DatabaseUtilities
 {
-    private static String tableName = "developer";
+
+    DeveloperDatabaseUtilities()
+    {
+        super("developer");
+    }
 
     public ArrayList<String> getAllUsernames() throws SQLException
     {

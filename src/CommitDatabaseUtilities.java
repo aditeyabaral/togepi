@@ -4,7 +4,10 @@ import java.time.*;
 
 class CommitDatabaseUtilities extends DatabaseUtilities
 {
-    private static String tableName = "commit";
+    CommitDatabaseUtilities()
+    {
+        super("commit");
+    }
 
     public ArrayList<String> getAllCommitID() throws SQLException
     {

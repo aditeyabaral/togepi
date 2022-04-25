@@ -7,7 +7,10 @@ import java.util.regex.*;
 
 class RelationDatabaseUtilities extends DatabaseUtilities
 {
-    private static String tableName = "repositoryuserelation";
+
+    RelationDatabaseUtilities() {
+        super("repositoryuserelation");
+    }
 
     public void createUserRepositoryRelation(String userID, String repositoryID, String relation) throws SQLException
     {
